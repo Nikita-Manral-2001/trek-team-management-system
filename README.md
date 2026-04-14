@@ -130,26 +130,28 @@ This is a fully developed real-world project showcasing operational workflow and
 
 ## 📸 Screenshots
 
-### 🧭 Add Trek Itinerary
+## 📸 Screenshots
 
-![Add](screenshots/add_itinerary.png)
+### ➕ Add Trek Itinerary
+![Add Trek](trek-team-management-system-screenshot/add_trek_itinerary.png)
 
-### 📋 Trek Listing
+### 📊 Dashboard
+![Dashboard](trek-team-management-system-screenshot/dashboard.png)
 
-![List](screenshots/trek_listing.png)
+### 📅 Date-wise Itinerary
+![Date-wise](trek-team-management-system-screenshot/datewise_itinerary.png)
 
-### 📅 Date-wise Trek View
+### 🧑‍🤝‍🧑 Employee Availability
+![Availability](trek-team-management-system-screenshot/employee_availability.png)
 
-![Calendar](screenshots/date_wise.png)
+### 📝 Form for Approval
+![Form](trek-team-management-system-screenshot/form_for_approval.png)
 
-### 📝 Team Form
+### ✅ Approved Forms
+![Approved](trek-team-management-system-screenshot/approved_form.png)
 
-![Form](screenshots/form.png)
+### 📋 Itinerary Details
+![Details](trek-team-management-system-screenshot/itinerary_details.png)
 
-### ✅ Approval Dashboard
-
-![Approval](screenshots/approval.png)
-
-### 📊 Trek Data View
-
-![Data](screenshots/data_view.png)
+### 🔤 Trek-wise Itinerary
+![Trek-wise](trek-team-management-system-screenshot/trekwise_itinerary.png)
