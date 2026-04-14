@@ -1,0 +1,497 @@
+﻿ @using TTH.Areas.Super.Models
+@model BaseCampManagerViewModel 
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<div class="Basecamp_form">
+    <div class="row justify-content-center">
+        <div class="col-md-12 ">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow">
+                        <div class="card-header  bg-light text-dark text-center">
+                            <h3 class="mb-0">Base Camp Manager Form</h3>
+
+                            @if (ViewBag.TrekName != null)
+                            {
+                                <p>@ViewBag.TrekName (@Convert.ToDateTime(ViewBag.StartDate).ToString("dd-MM-yyyy") - @Convert.ToDateTime(ViewBag.ToDate).ToString("dd-MM-yyyy")) (@ViewBag.Batch)</p>
+                            }
+
+                            else
+                            {
+                                <p>No participant data available.</p>
+                            }
+                        </div>
+                      
+                        <div class="card-body">
+                            <form method="post" id="baseCampForm" enctype="multipart/form-data" asp-action="SaveBaseCampManagerForm" asp-controller="ViewOperationTeamDetails">
+                                @if (ViewBag.TrekName != null)
+                            {
+
+                                    <input type="hidden" name="TrekName" value="@ViewBag.TrekName" />
+                                    <input type="hidden" name="TrekId" value="@ViewBag.TrekId" />
+                                    <input type="hidden" name="DepartureId" value="@ViewBag.DepartureId" />
+                                    <input type="hidden" name="StartDate" value="@ViewBag.StartDate"  />
+                                    <input type="hidden" name="EndDate" value="@ViewBag.ToDate" />
+                                    <input type="hidden" name="Batch" value="@ViewBag.Batch" />
+                                    <input type="hidden" name="FirstName" value="@ViewBag.FirstName" />
+                                    <input type="hidden" name="LastName" value="@ViewBag.LastName" />
+                                    <input type="hidden" name="Designation" value="@ViewBag.Designation" />
+                                    <input type="hidden" name="Email" value="@ViewBag.Email" />
+                                    <input type="hidden" name="id" value="@ViewBag.userId" />
+                                    
+                                    
+                            }
+                                
+                                    <div class="col-md-4">
+                                        <label class="form-label">Number Of Trekker</label>
+                                        <div class="d-flex gap-2">
+                                        <input type="number" class="form-control w-100" name="MaleTrekker" placeholder="Male" />
+                                            <input type="number" class="form-control w-100"name="FemaleTrekker" placeholder="Female" />
+                                        
+
+
+                                        </div>
+                                        <span class="text-danger"></span>
+                                    </div>
+
+
+
+                                <div id="helperContainer" class="col-md-4">
+                                    <label class="form-label">Helper Freelancer</label>
+                                    <div class="helper-row d-flex gap-2">
+                                        <input type="text" name="HelperFreelancers[0].Name" class="form-control" placeholder="Name" />
+                                        <input type="number" name="HelperFreelancers[0].Days" class="form-control" placeholder="Days" />
+                                        <input name="HelperFreelancers[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addHelper">+</button>
+                                    </div>
+                                </div>
+                              
+
+                              
+                                <div id="guideContainer" class="col-md-4">
+                                    <label class="form-label">Guide Freelancers</</label>
+                                    <div class="guide-row d-flex gap-2">
+                                        <input type="number" name="GuideFreelancer[0].Number" class="form-control" placeholder="Number" />
+                                        <input type="number" name="GuideFreelancer[0].Days" class="form-control" placeholder="Days" />
+                                        <input name="GuideFreelancer[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addGuide">+</button>
+                                    </div>
+                                </div>
+
+                                <div id="muleContainer" class="col-md-4">
+                                    <label class="form-label">Mule</</label>
+                                    <div class="mule-row d-flex gap-2">
+                                        <input type="number" name="Mules[0].Number" class="form-control" placeholder="Number" />
+                                        <input type="number" name="Mules[0].Days" class="form-control" placeholder="Days" />
+                                
+                                        <button type="button" class="btn btn-danger " id="addMule">+</button>
+                                    </div>
+                                </div>
+                                <div id="portersContainer" class="col-md-4">
+                                    <label class="form-label">Porters</</label>
+                                    <div class="porters-row d-flex gap-2">
+                                        <input type="number" name="Porters[0].number" class="form-control" placeholder="number" />
+                                        <input type="number" name="Porters[0].Days" class="form-control" placeholder="Days" />
+                                        <input name="Porters[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addPorters">+</button>
+                                    </div>
+                                </div>
+
+
+
+                                <div id="RoomArrivalsContainer" class="col-md-5">
+                                    <label class="form-label">Room Arrival</label>
+                                    <div class="RoomArrivals-row d-flex gap-2">
+                                        <select name="RoomArrivals[0].Date" class="form-control">
+                                            <option value="">Select Date</option>
+                                            @foreach (var date in Model.AvailableDates)
+                                            {
+                                                <option value="@date">@date</option>
+                                            }
+                                        </select>
+                                        <input name="RoomArrivals[0].Number" type="number" class="form-control" placeholder="Number" />
+                                        <input name="RoomArrivals[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addRoomArrivals"> + </button>
+                                    </div>
+                                    <span class="text-danger"></span>
+                                </div>
+
+
+
+                                <div id="DepartureContainer" class="col-md-5">
+                                        <label class="form-label">Departure</label>
+                                        <div class="Departure-row d-flex gap-2">
+                                        <select name="RoomArrivalsDepartures[0].Date" class="form-control">
+                                            <option value="">Select Date</option>
+                                            @foreach (var date in Model.AvailableDates)
+                                            {
+                                                <option value="@date">@date</option>
+                                            }
+                                        </select>
+                                       
+                                        <input name="RoomArrivalsDepartures[0].Number" type="number" class="form-control" placeholder="Number" />
+                                        <input name="RoomArrivalsDepartures[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addDeparture"> + </button>
+
+
+                                        </div>
+                                        <span class="text-danger"></span>
+                                    </div>
+
+                              
+                                    <div class="col-md-4">
+                                        <label class="form-label">Offlods</label>
+                                        <div class="d-flex gap-2">
+                                            <input type="number" class="form-control" name="OnlineOffloadMode" placeholder="Online" />
+                                            <input type="number" class="form-control" name="OflineOffloadMode" placeholder="Offline" />
+
+
+
+                                        </div>
+                                        </div>
+                                    
+
+
+                                <div class="col-md-4" id="MainTransportArrivalContainer">
+                                        <label class="form-label">Main Transport Arrival</label>
+                                        <div class="d-flex gap-2 MainTransportArrival-row">
+
+                                        <input name="MainTransportArrivals[0].Number" type="text" class="form-control" placeholder="Car Number" />
+                                        <input name="MainTransportArrivals[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addMainTransportArrival"> + </button>
+
+
+                                        </div>
+                                        <span class="text-danger"></span>
+                                    </div>
+
+                                <div class="col-md-4" id="MainTransportDepartureContainer">
+                                        <label class="form-label">Main Transport Departure</label>
+                                    <div class="d-flex gap-2 MainTransportDeparture-row">
+
+                                        <input name="MainTransportDepartures[0].Number" type="text" class="form-control" placeholder="Car Number" />
+                                        <input name="MainTransportDepartures[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addMainTransportDeparture"> + </button>
+
+
+                                        </div>
+                                        <span class="text-danger"></span>
+                                </div>
+
+
+
+                                <div class="col-md-4" id="LocalTransportArrivalContainer">
+                                        <label class="form-label">Local Transport Arrival</label>
+                                    <div class="d-flex gap-2 LocalTransportArrival-row">
+
+                                        <input name="LocalTransportArrivals[0].Number" type="text" class="form-control" placeholder="Car Number" />
+                                        <input name="LocalTransportArrivals[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addLocalTransportArrival"> + </button>
+
+
+                                        </div>
+                                        <span class="text-danger"></span>
+                                    </div>
+
+                                <div class="col-md-4" id="LocalTransportDepartureContainer">
+                                        <label class="form-label">Local Transport Departure</label>
+                                    <div class="d-flex gap-2 LocalTransportDeparture-row">
+                                        
+
+                                        <input name="LocalTransportDepartures[0].Number" type="text" class="form-control" placeholder="Car Number" />
+                                        <input name="LocalTransportDepartures[0].Vendor" type="text" class="form-control" placeholder="Vendor" />
+                                        <button type="button" class="btn btn-danger " id="addLocalTransportDeparture"> + </button>
+
+
+                                        </div>
+                                        <span class="text-danger"></span>
+                                    </div>
+
+
+
+                               @*  <div class="col-md-5">
+                                    <label class="form-label">Trekker Status</label>
+                                    @if (Model.Participants != null && Model.Participants.Any())
+                                    {
+                                        <div id="participantContainer">
+                                            @for (var i = 0; i < Model.Participants.Count; i++)
+                                            {
+                                                var participant = Model.Participants[i];
+                                                <div class="d-flex gap-2 mb-2">
+                                                    <input type="hidden" name="TrekkersStatus[@i].ParticipantId" value="@participant.ParticipantId" />
+                                                    <input type="hidden" name="TrekkersStatus[@i].ParticipantFirstName" value="@participant.FirstName" />
+                                                    <input type="hidden" name="TrekkersStatus[@i].ParticipantLastName" value="@participant.LastName" />
+
+                                                    <input type="text" class="form-control"
+                                                           value="@(participant.FirstName) @(participant.LastName)" readonly />
+
+                                                    <select class="form-select form-select-sm" name="TrekkersStatus[@i].TrekkerStatus" required>
+                                                        <option disabled selected>Select Trekker Status</option>
+                                                        <option>Summited</option>
+                                                        <option>Completed, Not Summited</option>
+                                                        <option>Return Halfway</option>
+                                                        <option>Return from Base Camp</option>
+                                                        <option>Didn't Reach Base Camp</option>
+                                                    </select>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="alert alert-info">No participants found.</div>
+                                    }
+                                </div> *@
+                                <div class="form-group col-md-5">
+                                    
+                                    <label>Enter Details:</label>
+                                    <textarea name="TeaxtArea" class="form-control" rows="5" placeholder="Type here..."></textarea>
+                                </div>
+
+
+                                    <div class="mt-4 col-md-4">
+                                        <button type="button" class="btn btn-dark btn-sm w-100" onclick="document.getElementById('baseCampForm').submit();">Submit</button>
+
+                                    </div>
+
+
+
+                               
+
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  
+
+  
+
+
+    <script>
+    $(document).ready(function () {
+        let helperIndex = 1;
+        let guideIndex = 1;
+        let muleIndex = 1;
+        let portersIndex = 1;
+        let roomArrivals = 1;
+        let roomArrivalDeparture = 1;
+        let mainTransportArrival = 1;
+        let mainTransportDeparture = 1;
+        let localTransportArrival = 1;
+        let localTransportDeparture =1;
+
+
+
+        $("#addHelper").click(function () {
+            let newHelper = `
+                    <div class="helper-row d-flex gap-2 mt-2">
+                            <input class="form-control" name="HelperFreelancers[${helperIndex}].Name" placeholder="Name" />
+                    <input class="form-control" name="HelperFreelancers[${helperIndex}].Days" placeholder="Days" type="number" />
+                                        <input class="form-control" name="HelperFreelancers[${helperIndex}].Vendor" placeholder="Vendor" />
+                    <button type="button" class="btn btn-danger  remove-row">-</button>
+                </div>`;
+            $("#helperContainer").append(newHelper);
+            helperIndex++;
+        });
+
+        $("#addGuide").click(function () {
+            let newGuide = `
+                    <div class="guide-row d-flex gap-2 mt-2">
+                              <input class="form-control" name="GuideFreelancer[${guideIndex}].Number" placeholder="Number" />
+                    <input class="form-control" name="GuideFreelancers[${guideIndex}].Days" placeholder="Days" type="number" />
+                             <input class="form-control" name="GuideFreelancers[${guideIndex}].Vendor" placeholder="Vendor" />
+                    <button type="button" class="btn btn-danger  remove-row">-</button>
+                </div>`;
+            $("#guideContainer").append(newGuide);
+            guideIndex++;
+        });
+
+        $("#addMule").click(function () {
+            let newMules = `
+                            <div class="mule-row d-flex gap-2 mt-2">
+                               <input class="form-control" name="Mules[${muleIndex}].Number" placeholder="Number" />
+                                <input class="form-control" name="Mules[${muleIndex}].Days" placeholder="Days" type="number"/>
+                                      <button type="button" class="btn btn-danger  remove-row">-</button>
+                    </div>`;
+            $("#muleContainer").append(newMules);
+            muleIndex++;
+        });
+
+        $("#addPorters").click(function () {
+            let newPorters = `
+                                    <div class="porters-row d-flex gap-2 mt-2">
+                                                <input class="form-control" name="Porters[${portersIndex}].Number" placeholder="Number" />
+                    <input class="form-control" name="Porters[${portersIndex}].Days" placeholder="Days" type="number" />
+                    <input class="form-control" name="Porters[${portersIndex}].Vendor" placeholder="Vendor" />
+                     <button type="button" class="btn btn-danger  remove-row">-</button>
+                        </div>`;
+            $("#portersContainer").append(newPorters);
+            portersIndex++;
+        });
+
+
+
+        $("#addRoomArrivals").click(function () {
+            let newRoomArrivals = `
+                                        <div class="RoomArrivals-row d-flex gap-2 mt-2">
+
+
+                                                          <select class="form-control" name="RoomArrivals[${roomArrivals.length}].Date >
+                                                    <option value="Select Date">Select Date</option>
+    @foreach (var date in Model.AvailableDates)
+    {
+                                                        <option value="@date">@date</option>
+    }
+                                            </select>
+                                                      
+
+                                            <input class="form-control" name="RoomArrivals[${roomArrivals}].Number" placeholder="Number" type="number" />
+                                                    <input class="form-control" name="RoomArrivals[${roomArrivals}].Vendor" placeholder="Vendor"  />
+
+                            <button type="button" class="btn btn-danger  remove-row">-</button>
+                            </div>`;
+            $("#RoomArrivalsContainer").append(newRoomArrivals);
+            roomArrivals++;
+        });
+
+        $("#addDeparture").click(function () {
+            let newDeparture = `
+                                            <div class="Departure-row d-flex gap-2 mt-2">
+
+
+                                                          <select class="form-control" name="RoomArrivalsDepartures[${roomArrivalDeparture.length}].Date >
+                                                        <option value="Select Date">Select Date</option>
+    @foreach (var date in Model.AvailableDates)
+    {
+                                                                <option value="@date">@date</option>
+    }
+                                                </select>
+                                                                 
+
+                                                        <input class="form-control" name="RoomArrivalsDepartures[${roomArrivalDeparture}].Number" placeholder="Number" type="number" />
+                                                                <input class="form-control" name="RoomArrivalsDepartures[${roomArrivalDeparture}].Vendor" placeholder="Vendor" />
+
+                                <button type="button" class="btn btn-danger  remove-row">-</button>
+                                </div>`;
+            $("#DepartureContainer").append(newDeparture);
+            roomArrivalDeparture++;
+        });
+
+        $("#addMainTransportArrival").click(function () {
+            let newMainTransport = `
+                                                    <div class="MainTransportArrival-row d-flex gap-2 mt-2">
+                                                                                   <input class="form-control" name="MainTransportArrivals[${mainTransportArrival}].Number" placeholder="Car Number" type="text" />
+                                                                                <input class="form-control" name="MainTransportArrivals[${mainTransportArrival}].Vendor" placeholder="Vendor" />
+
+                                    <button type="button" class="btn btn-danger  remove-row">-</button>
+                                    </div>`;
+            $("#MainTransportArrivalContainer").append(newMainTransport);
+            mainTransportArrival++;
+        });
+
+        $("#addMainTransportDeparture").click(function () {
+            let newMainTransportDeparture = `
+                                                    <div class="MainTransportDeparture-row d-flex gap-2 mt-2">
+
+                                                                                           <input class="form-control" name="MainTransportDepartures[${mainTransportDeparture}].Number" placeholder="Car Number" type="text" />
+                                                                                        <input class="form-control" name="MainTransportDepartures[${mainTransportDeparture}].Vendor" placeholder="Vendor" />
+
+                                        <button type="button" class="btn btn-danger  remove-row">-</button>
+                                        </div>`;
+            $("#MainTransportDepartureContainer").append(newMainTransportDeparture);
+            mainTransportDeparture++;
+        });
+
+
+        $("#addLocalTransportArrival").click(function () {
+            let newLocalTransportArrival = `
+                                                        <div class="LocalTransportArrival-row d-flex gap-2 mt-2">
+
+
+                                                                                            <input class="form-control" name="LocalTransportArrivals[${localTransportArrival}].Number" placeholder="Car Number" type="text" />
+                                                                                                    <input class="form-control" name="LocalTransportArrivals[${localTransportArrival}].Vendor" placeholder="Vendor"  />
+
+                                            <button type="button" class="btn btn-danger  remove-row">-</button>
+                                            </div>`;
+            $("#LocalTransportArrivalContainer").append(newLocalTransportArrival);
+            localTransportArrival++;
+        });
+
+
+
+        $("#addLocalTransportDeparture").click(function () {
+            let newLocalDeparture = `
+                                                            <div class="LocalTransportDeparture-row d-flex gap-2 mt-2">
+
+
+                                                                                                                <input class="form-control" name="LocalTransportDepartures[${localTransportDeparture}].Number" placeholder="Car Number" type="text" />
+                                                                                                                <input class="form-control" name="LocalTransportDepartures[${localTransportDeparture}].Vendor" placeholder="Vendor" />
+
+                                                <button type="button" class="btn btn-danger  remove-row">-</button>
+                                                </div>`;
+            $("#LocalTransportDepartureContainer").append(newLocalDeparture);
+            localTransportDeparture++;
+        });
+
+
+
+
+
+
+
+
+
+        $("#baseCampForm").submit(function (e) {
+            e.preventDefault();
+
+            let formData = $(this).serialize();
+            console.log(formData); // Debugging - Check data before sending
+
+            $.ajax({
+                type: "POST",
+                url: "/ViewOperationTeamDetails/SaveBaseCampManagerForm",
+                data: formData,
+                success: function (response) {
+                    alert("Form submitted successfully!");
+                    window.location.href = "/SuccessView";
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                    alert("Error submitting form.");
+                }
+            });
+        });
+    });
+
+
+    document.addEventListener('click', function (e) {
+        if (e.target && e.target.classList.contains('remove-row')) {
+            e.target.closest('.d-flex').remove();
+        }
+    });
+
+    </script>
+<script>
+    function toggleInput() {
+        let onlineRadio = document.getElementById("online");
+        let onlineNumberContainer = document.getElementById("onlineNumberContainer");
+        let offlineNumberContainer = document.getElementById("offlineNumberContainer");
+
+        if (onlineRadio.checked) {
+            onlineNumberContainer.style.display = "block";
+            offlineNumberContainer.style.display = "none";
+        } else {
+            onlineNumberContainer.style.display = "none";
+            offlineNumberContainer.style.display = "block";
+        }
+    }
+
+    // Initialize on page load
+    window.onload = toggleInput;
+</script>

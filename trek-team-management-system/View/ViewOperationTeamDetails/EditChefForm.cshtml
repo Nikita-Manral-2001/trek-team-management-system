@@ -1,0 +1,249 @@
+﻿@using TTH.Areas.Super.Data.Operation_Team
+@model List<ChefFormRatings>
+
+@{
+    var id = ViewBag.Id ?? 0;
+}
+<style>
+    .star-rating {
+        direction: rtl;
+        display: inline-flex;
+        gap: 5px;
+    }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 24px;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.3s ease-in-out;
+        }
+
+            /* Highlight stars on hover */
+            .star-rating label:hover,
+            .star-rating label:hover ~ label {
+                color: gold;
+            }
+
+        /* Maintain highlight after selection */
+        .star-rating input:checked ~ label {
+            color: gold;
+        }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .itinerary-day-box {
+        border: 1px solid #ddd;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+    /* Improve form layout */
+    .form-label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .card {
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        min-height: 200px;
+    }
+
+    /* Improve form input styling */
+    .form-control {
+        max-width: 100%;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    /* Button Styling */
+    #submitButton {
+        background-color: #d9534f;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+        #submitButton:hover {
+            background-color: #c9302c;
+        }
+
+</style>
+
+@{
+    var campRatings = new List<ChefFormRatings>();
+}
+
+
+<div class="container my-2">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h3 class="mb-0">Chef Form</h3>
+                           @if (Model.First().TrekName != null)
+                            {
+                                <p>@Model.First().TrekName (@Convert.ToDateTime(Model.First().FromDate).ToString("dd-MM-yyyy") - @Convert.ToDateTime(Model.First().ToDate).ToString("dd-MM-yyyy"))</p>
+                            } 
+
+                            else
+                            {
+                                <p>No participant data available.</p>
+                            }
+                        </div>
+
+                        <div class="card-body">
+                            <form method="post" id="ChefForm" asp-action="SaveEditChefForm" asp-controller="ViewOperationTeamDetails">
+                                <input type="hidden" name="Id" value="@id" />
+                                @if (Model.First().TrekName != null)
+                                {
+
+                                     <input type="hidden" name="TrekName" value="@Model.First().TrekName" />
+                                    <input type="hidden" name="TrekId" value="@Model.First().TrekId" />
+                                    <input type="hidden" name="DepartureId" value="@Model.First().DepartureId" />
+                                    <input type="hidden" name="StartDate" value="@Model.First().FromDate" />
+                                    <input type="hidden" name="EndDate" value="@Model.First().ToDate" />
+                                   @*  <input type="hidden" name="Batch" value="@Model.First().Batch" /> *@
+                                    <input type="hidden" name="Email" value="@Model.First().Email" />
+                                    <input type="hidden" name="FirstName" value="@Model.First().FirstName" />
+                                    <input type="hidden" name="LastName" value="@Model.First().LastName" />
+
+                                    <input type="hidden" name="ItineraryDaysCount" value="@ViewBag.ItineraryDaysCount" />
+                                }
+
+
+                             
+                                    <div class="row">
+
+                                    @for (int i = 0; i < Model.Count; i++)
+                                    {
+                                        var chefRating = Model[i];
+
+                                        <div class="col-md-6 mb-4">
+                                            <div class="card p-3">
+                                                <h4>Camp Day @(i + 1)</h4>
+                                                <div class="form-group">
+                                                    <label class="form-label"><b>Chef Name</b></label>
+                                                    <input type="text" name="ChefName[@i].Name" class="form-control form-control-sm" placeholder="Name" value="@chefRating.ChefName" />
+                                                </div>
+
+                                                @foreach (var category in new[] { "Timing", "Hygiene", "Taste", "AsPerMenu", "Involvement" })
+                                                {
+                                                    var categoryRating = (int)typeof(ChefFormRatings).GetProperty($"{category}Rating").GetValue(chefRating);
+
+                                                    <div class="form-group">
+                                                        <label class="form-label"><b>@category</b></label>
+                                                        <div class="star-rating">
+                                                            @for (int j = 5; j >= 1; j--)
+                                                            {
+                                                                var checkedAttr = categoryRating == j ? "checked" : "";
+                                                                <input type="radio" id="@category@(i)_@(j)" name="@category-Rating[@i]" value="@j" @checkedAttr />
+                                                                <label for="@category@(i)_@(j)" class="star">&#9733;</label>
+                                                            }
+                                                        </div>
+                                                        <input type="hidden" id="@category RatingValue@(i)" name="@category RatingValue[@i]" value="@categoryRating" />
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    </div>
+                              
+
+                                <div class="mt-4">
+                                    <button type="submit" id="submitButton" class="btn btn-danger">Approval</button>
+                                </div>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('ChefForm');
+
+        function validateDay(dayNumber) {
+            const chefName = document.querySelector(`input[name="ChefName[${dayNumber}].Name"]`).value.trim();
+
+            if (!chefName) {
+                return false; // Chef Name is required
+            }
+
+            const ratingTypes = ['Timing', 'Hygiene', 'Taste', 'AsPerMenu', 'Involvement'];
+            for (const type of ratingTypes) {
+                const selectedRating = document.querySelector(`input[name="${type}-Rating[${dayNumber}]"]:checked`);
+                if (!selectedRating) {
+                    alert(`Please provide ${type} rating for ${chefName} on Day ${dayNumber}`);
+                    return false;
+                }
+                // Update hidden field
+                const hiddenInput = document.getElementById(`${type}RatingValue${dayNumber}`);
+                if (hiddenInput) hiddenInput.value = selectedRating.value;
+            }
+            return true;
+        }
+
+        form.addEventListener('submit', function (e) {
+            const daysCount = @ViewBag.ItineraryDaysCount;
+            let isValid = false;
+
+            for (let i = 1; i <= daysCount; i++) {
+                if (validateDay(i)) {
+                    isValid = true;
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                alert("Please fill at least one day's ratings before submitting.");
+            }
+        });
+
+        // Star rating handlers
+        document.querySelectorAll('.star-rating input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const ratingGroup = this.name;
+                const labels = document.querySelectorAll(`input[name="${ratingGroup}"] ~ label`);
+                labels.forEach(label => label.style.color = "#ddd"); // Reset all stars
+
+                let selectedValue = parseInt(this.value);
+                labels.forEach(label => {
+                    let labelForValue = parseInt(label.htmlFor.match(/_(\d+)$/)[1]);
+                    if (labelForValue <= selectedValue) {
+                        label.style.color = "gold";
+                    }
+                });
+
+                // Extract Day Number from ID
+                const dayMatch = this.id.match(/\d+/g);
+                if (dayMatch) {
+                    const dayNumber = dayMatch[0];
+                    const hiddenInput = document.getElementById(`${ratingGroup.replace('-Rating', '')}RatingValue${dayNumber}`);
+                    if (hiddenInput) hiddenInput.value = this.value;
+                }
+            });
+        });
+    });
+</script>

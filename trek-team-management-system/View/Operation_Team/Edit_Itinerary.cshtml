@@ -1,0 +1,215 @@
+﻿@using TTH.Areas.Super.Data.Operation_Team
+@model TrekItinerary
+
+<div class="container my-2">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h3 class="mb-0">Edit Itinerary</h3>
+                        </div>
+                        <div class="card-body">
+
+                            <form asp-action="Edit_Itinerary_Departure" method="post" id="itineraryForm">
+                                <div class="form-group col-md-6" id="TrekDateGroup">
+                                    <label for="TrekDeparture">Select Trek Departure</label>
+                                    <select id="TrekDeparture" class="form-control" name="id" onchange="handleDepartureChange(this)">
+    <option value="">Select Departure</option>
+    @if (ViewBag.TrekDepartures != null && ViewBag.TrekDepartures.Count > 0)
+    {
+                                            foreach (var trekDeparture in ViewBag.TrekDepartures)
+                                            {
+                                                <option value="@trekDeparture.DepartureId"
+                                                        selected="@(ViewBag.SelectedDepartureId != null && trekDeparture.DepartureId == (int)ViewBag.SelectedDepartureId ? "selected" : null)">
+                                                    @trekDeparture.StartDate.ToString("yyyy-MM-dd") - @trekDeparture.EndDate.ToString("yyyy-MM-dd") (@trekDeparture.Batch)
+                                                </option>
+                                            }
+    }
+    else
+    {
+        <option>No available departures</option>
+    }
+</select>
+                                </div>
+                                <input type="hidden" id="HiddenDepartureId" name="DepartureId" />
+                            </form>
+
+
+                           
+
+
+                            <form asp-action="Edit_Itinerary" method="post">
+                                <div class="row g-3">
+                                    <input type="hidden" class="sele" name="SelectedDate" value="@ViewBag.SelectedDate" />
+
+                                    <div class="col-md-4">
+                                        <label for="TrekName">Trek Name</label>
+                                        <input type="text" id="TrekName" class="form-control" asp-for="TrekName" />
+                                        <input type="hidden" asp-for="TrekId" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="TrekName">Trek Short Name (Don't use - and blank space)</label>
+                                        <input type="text" id="TrekName" class="form-control" asp-for="TrekShortName" />
+                                        <input type="hidden" asp-for="TrekShortName" />
+                                    </div>
+
+                                   
+                                
+
+                                    <div class="form-group col-md-4" id="StartDate">
+                                        <label for="StartDate">Start Date</label>
+                                        <input type="date" id="StartDateInput" class="form-control" asp-for="StartDate" />
+                                    </div>
+
+                                    <div class="form-group col-md-4" id="EndDate">
+                                        <label for="EndDate">End Date</label>
+                                        <input type="date" id="EndDateInput" class="form-control" asp-for="EndDate" />
+                                    </div>
+                                </div>
+
+                                <input type="hidden" asp-for="Id" />
+                                <input type="hidden" id="ItineraryType" value="@Model.ItineraryType" />
+
+                                <div class="inputContainer" id="itineraryContainer">
+                                    @if (Model.ItineraryDetails != null && Model.ItineraryDetails.Any())
+                                    {
+                                        @foreach (var detail in Model.ItineraryDetails.Select((value, index) => new { value, index }))
+                                        {
+                                            <div class="inputGroup mb-3" id="inputGroup-@detail.index">
+                                                <label for="day@detail.index">Day @(@detail.index + 1)</label>
+                                                <label for="heading@detail.index">Heading</label>
+                                                <input type="text" class="form-control mb-2"
+                                                       name="ItineraryDetails[@detail.index].ItineraryHeading"
+                                                       value="@detail.value.ItineraryHeading"
+                                                       placeholder="Enter trek activity" />
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p>No itinerary details available.</p>
+                                    }
+                                </div>
+
+                                <button type="button" class="btn btn-success mb-3 addButton">+</button>
+                                <button type="button" class="btn btn-danger mb-3 removeButton">-</button>
+
+                                <br />
+
+                                <div class="mb-3 row">
+                                    <div class="col-md-4 d-flex align-items-center">
+                                        <label for="FromTlDate" class="me-2">From</label>
+                                        <input type="text" class="form-control" id="FromTlDate" name="FromDate" value="@Model.FromDate" required />
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-center">
+                                        <label for="TOTlDate" class="me-2">To</label>
+                                        <input type="text" class="form-control" id="TOTlDate" name="ToDate" value="@Model.ToDate" required />
+                                    </div>
+                                </div>
+
+
+                                <br />
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const itineraryContainer = document.getElementById("itineraryContainer");
+        const addButton = document.querySelector(".addButton");
+        const removeButton = document.querySelector(".removeButton");
+
+        let dayCount = itineraryContainer.querySelectorAll(".inputGroup").length;
+
+        // Function to add a new day
+        addButton.addEventListener("click", () => {
+            dayCount++;
+            const newGroup = document.createElement("div");
+            newGroup.className = "inputGroup mb-3";
+            newGroup.id = `inputGroup-${dayCount - 1}`;
+            newGroup.innerHTML = `
+                    <label for="day${dayCount - 1}">Day ${dayCount}</label>
+                    <label for="heading${dayCount - 1}">Heading</label>
+                    <input type="text" class="form-control mb-2"
+                           name="ItineraryDetails[${dayCount - 1}].ItineraryHeading"
+                           placeholder="Enter trek activity" />
+                `;
+            itineraryContainer.appendChild(newGroup);
+        });
+
+        // Function to remove the last day
+        removeButton.addEventListener("click", () => {
+            if (dayCount > 0) {
+                const lastGroup = document.getElementById(`inputGroup-${dayCount - 1}`);
+                if (lastGroup) {
+                    itineraryContainer.removeChild(lastGroup);
+                    dayCount--;
+                }
+            } else {
+                alert("No more days to remove.");
+            }
+        });
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const selectedDepartureDate = "@ViewBag.SelectedDepartureDate";
+
+        if (selectedDepartureDate) {
+            const startDateInput = document.getElementById("StartDateInput");
+            if (startDateInput) {
+                startDateInput.value = selectedDepartureDate;
+            }
+        }
+    });
+    document.addEventListener("DOMContentLoaded", function () {
+        const itineraryType = "@Model.ItineraryType";
+
+        // Show or hide elements based on the itinerary type
+        if (itineraryType === "Fixed") {
+            document.getElementById("TrekDateGroup").style.display = "block";
+            document.getElementById("StartDate").style.display = "none";
+            document.getElementById("EndDate").style.display = "none";
+        } else if (itineraryType === "Customize") {
+            document.getElementById("TrekDateGroup").style.display = "none";
+            document.getElementById("StartDate").style.display = "block";
+            document.getElementById("EndDate").style.display = "block";
+        }
+    });
+
+    function handleDepartureChange(selectElement) {
+        const selectedDepartureId = selectElement.value;
+
+        if (selectedDepartureId) {
+            // Set the selected DepartureId in the hidden input field
+            document.getElementById("HiddenDepartureId").value = selectedDepartureId;
+
+            // Submit the form
+            document.getElementById("itineraryForm").submit();
+        } else {
+            alert("Please select a valid Departure.");
+        }
+    }
+
+    function handleDepartureChange(selectElement) {
+        const selectedDepartureId = selectElement.value;
+
+        if (selectedDepartureId) {
+            // Set the selected DepartureId in the hidden input field
+            document.getElementById("HiddenDepartureId").value = selectedDepartureId;
+
+            // Submit the form
+            document.getElementById("itineraryForm").submit();
+        } else {
+            alert("Please select a valid Departure.");
+        }
+    }
+    
+
+</script>

@@ -1,0 +1,197 @@
+﻿@using TTH.Areas.Super.Models
+@model Tuple<TrekDepartureViewModel, TrekDepartureItineraryDetailViewModel>
+
+
+
+<div class="container my-2">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h3 class="mb-0">Edit Itinerary</h3>
+                        </div>
+                        <div class="card-body">
+                            <!-- Form to reload itinerary details -->
+                            <form asp-action="Edit_Itinerary_Departure" method="post" id="itineraryForm">
+                                @Html.AntiForgeryToken()
+                                <div class="form-group col-md-6" id="TrekDateGroup">
+                                    <label for="TrekDeparture">Select Trek Departure</label>
+                                    <select id="TrekDeparture" class="form-control" name="id" onchange="handleDepartureChange(this)">
+                                        <option value="">Select Departure</option>
+                                        @if (ViewBag.TrekDepartures != null)
+                                        {
+                                            foreach (var trekDeparture in ViewBag.TrekDepartures as List<TrekDepartureViewModel>)
+                                            {
+                                                @if (ViewBag.SelectedDepartureId == trekDeparture.DepartureId)
+                                                {
+                                                    <option value="@trekDeparture.DepartureId" selected>
+                                                        @trekDeparture.StartDate.ToString("yyyy-MM-dd") - @trekDeparture.EndDate.ToString("yyyy-MM-dd")
+                                                    </option>
+                                                }
+                                                
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <option>No available departures</option>
+                                        }
+                                    </select>
+                                </div>
+                                <input type="hidden" id="HiddenDepartureId" name="DepartureId" />
+                                <input type="hidden" id="HiddenStartDate" name="StartDate" />
+                                <input type="hidden" id="HiddenEndDate" name="EndDate" />
+
+                                <div class="form-group col-md-6" id="TrekNameGroup">
+                                    <label for="TrekName">Trek Name</label>
+                                    <input type="text"
+                                           id="TrekName"
+                                           class="form-control"
+                                           name="TrekName"
+                                           value="@(ViewBag.TrekName ?? "")"
+                                           readonly />
+                                    <input type="hidden"
+                                           id="TrekId"
+                                           class="form-control"
+                                           name="TrekId"
+                                           value="@(ViewBag.TrekId ?? "")"
+                                           readonly />
+                                </div>
+                                <div class="inputContainer" id="itineraryContainer">
+                                    @if (ViewBag.ItineraryDetails != null)
+                                    {
+                                        var itineraryDetails = (List<TTH.Areas.Super.Models.ItineraryDetailViewModel>)ViewBag.ItineraryDetails;
+                                        for (int i = 0; i < itineraryDetails.Count; i++)
+                                        {
+                                            <div class="inputGroup mb-3" id="inputGroup-@(i + 1)">
+                                                <label for="ItineraryHeading_@(i + 1)">Day @(i + 1) <span class="text-danger">*</span></label>
+                                                <input type="text" id="ItineraryHeading_@(i + 1)" name="ItineraryDetails[@i].ItineraryHeading"
+                                                       class="form-control" value="@itineraryDetails[i].ItineraryHeading" required />
+                                                <input type="hidden" name="ItineraryDetails[@i].ItineraryDay" value="@(i + 1)" />
+                                                <span class="text-danger" id="Error_@(i + 1)"></span>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                               
+                                <button type="button" class="btn btn-success mb-3 addButton">+</button>
+                                <button type="button" class="btn btn-danger mb-3 removeButton">-</button>
+                            </form>
+
+                            <!-- Form to save itinerary changes -->
+                            <form asp-action="Save_Itinerary_Departure" method="post" id="ItineraryDepartureForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="DepartureId" id="SaveDepartureId" />
+                                <input type="hidden" name="StartDate" id="SaveStartDate" />
+                                <input type="hidden" name="EndDate" id="SaveEndDate" />
+                                <input type="hidden" name="TrekId" id="SaveTrekId" />
+                                <input type="hidden" name="TrekName" id="SaveTrekName" />
+                                <div id="saveItineraryDetailsContainer"></div>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const itineraryContainer = document.getElementById("itineraryContainer");
+        const addButton = document.querySelector(".addButton");
+        const removeButton = document.querySelector(".removeButton");
+        const saveItineraryDetailsContainer = document.getElementById("saveItineraryDetailsContainer");
+
+        let dayCount = itineraryContainer.querySelectorAll(".inputGroup").length;
+
+        // Add new itinerary day
+        addButton.addEventListener("click", () => {
+            dayCount++;
+            const newGroup = document.createElement("div");
+            newGroup.className = "inputGroup mb-3";
+            newGroup.id = `inputGroup-${dayCount}`;
+            newGroup.innerHTML = `
+                        <label for="ItineraryHeading_${dayCount}">Day ${dayCount}</label>
+                        <input type="text" class="form-control mb-2" id="ItineraryHeading_${dayCount}" name="ItineraryDetails[${dayCount - 1}].ItineraryHeading" placeholder="Enter trek activity" />
+                        <input type="hidden" name="ItineraryDetails[${dayCount - 1}].ItineraryDay" value="${dayCount}" />
+                             <span class="text-danger" id="Error_${dayCount}"></span>
+                    `;
+            itineraryContainer.appendChild(newGroup);
+        });
+
+
+        // Remove the last itinerary day
+        removeButton.addEventListener("click", () => {
+            if (dayCount > 0) {
+                const lastGroup = document.getElementById(`inputGroup-${dayCount}`);
+                if (lastGroup) {
+                    itineraryContainer.removeChild(lastGroup);
+                    dayCount--;
+                }
+            } else {
+                alert("No more days to remove.");
+            }
+        });
+        document.getElementById("ItineraryDepartureForm").addEventListener("submit", function (e) {
+            let valid = true;
+
+            // Validate Itinerary Headings
+            const itineraryGroups = document.querySelectorAll("#itineraryContainer .inputGroup");
+            itineraryGroups.forEach((group, index) => {
+                const headingInput = group.querySelector('input[type="text"]');
+                const errorSpan = group.querySelector(`#Error_${index + 1}`);
+                if (!headingInput.value.trim()) {
+                    valid = false;
+                    errorSpan.innerText = "This field is required.";
+                } else {
+                    errorSpan.innerText = "";
+                }
+            });
+
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+    
+
+        // Prepare data for save form before submitting
+        document.getElementById("ItineraryDepartureForm").addEventListener("submit", function () {
+            const selectedDeparture = document.getElementById("TrekDeparture").selectedOptions[0];
+            document.getElementById("SaveDepartureId").value = selectedDeparture.value;
+            document.getElementById("SaveStartDate").value = selectedDeparture.getAttribute("data-start-date");
+            document.getElementById("SaveEndDate").value = selectedDeparture.getAttribute("data-end-date");
+            document.getElementById("SaveTrekId").value = document.getElementById("TrekId").value;
+            document.getElementById("SaveTrekName").value = document.getElementById("TrekName").value;
+
+            saveItineraryDetailsContainer.innerHTML = '';
+            const itineraryGroups = document.querySelectorAll("#itineraryContainer .inputGroup");
+            itineraryGroups.forEach((group, index) => {
+                const headingInput = group.querySelector('input[type="text"]');
+                const dayInput = group.querySelector('input[type="hidden"]');
+
+                if (headingInput && dayInput) {
+                    saveItineraryDetailsContainer.innerHTML += `
+                                <input type="hidden" name="ItineraryDetails[${index}].ItineraryHeading" value="${headingInput.value}" />
+                                <input type="hidden" name="ItineraryDetails[${index}].ItineraryDay" value="${dayInput.value}" />
+                            `;
+                }
+            });
+        });
+    });
+
+
+    function handleDepartureChange(selectElement) {
+        const selectedDepartureId = selectElement.value;
+        if (selectedDepartureId) {
+            const selectedDeparture = selectElement.options[selectElement.selectedIndex];
+            document.getElementById("HiddenDepartureId").value = selectedDeparture.value;
+            document.getElementById("HiddenStartDate").value = selectedDeparture.getAttribute("data-start-date");
+            document.getElementById("HiddenEndDate").value = selectedDeparture.getAttribute("data-end-date");
+        } else {
+            alert("Please select a valid Departure.");
+        }
+    }
+</script>

@@ -1,0 +1,142 @@
+﻿@using TTH.Areas.Super.Models
+@model TeamFeedbackApprovalViewModel
+
+
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow-lg border-0 rounded">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h3 class="mb-0">Feedback Form</h3>
+                        </div>
+
+
+                        <div class="row p-3 justify-content-center">
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <input type="text" id="searchBox" class="form-control" placeholder="Search by Trek Name, Role, or Name" />
+                                    </div>
+                                    <div class="col-md-3 mb-2">
+                                        <input type="date" id="searchStartDate" class="form-control" />
+                                    </div>
+                                    <div class="col-md-3 mb-2 d-flex gap-2">
+                                        <button class="btn btn-danger w-100" onclick="filterTable()">Search</button>
+                                        <button class="btn btn-secondary w-100" onclick="resetSearch()">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        
+                        <div class="p-2">
+                            <table class="table table-sm table-bordered text-center">
+                                <thead class="bg-success text-white">
+                                    <tr>
+                                        <th>Trek</th>
+                                        <th>Start</th>
+                                        <th>Role</th>
+                                        <th>Name</th>
+                                        <th>Status</th>
+                                        <th>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var trek in Model.SubmittedApprovals)
+                                    {
+                                        <tr>
+                                            <td>@trek.TrekName</td>
+                                            <td>@trek.StartDate.ToString("yyyy-MM-dd")</td>
+                                            <td>@trek.Designation</td>
+                                            <td>@trek.TeamMemberName</td>
+                                            <td>Approved</td>
+                                            <td>
+                                                <a href="@Url.Action(
+                                                    trek.Designation == "BCM" ? "EditBCMForm" :
+                                                    (trek.Designation == "TL" ? "EditTLForm" :
+                                                    (trek.Designation == "Chef" ? "EditChefForm" : "DefaultAction")),
+                                                    "ViewOperationTeamDetails",
+                                                    new {
+                                                        departureId = trek.DepartureId,
+                                                        trekId = trek.TrekId,
+                                                        teamMemberName = trek.TeamMemberName,
+                                                        designation = trek.Designation,
+                                                        id = trek.Id
+                                                    })"
+                                                   class="btn btn-success btn-sm me-2">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div> 
+                </div> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterTable() {
+        const query = document.getElementById('searchBox').value.toLowerCase().trim();
+        const startDate = document.getElementById('searchStartDate').value;
+        const rows = document.querySelectorAll('table tbody tr');
+        let found = false;
+
+        rows.forEach(row => {
+            const trekName = row.cells[0].textContent.toLowerCase();
+            const date = row.cells[1].textContent.trim(); 
+            const role = row.cells[2].textContent.toLowerCase();
+            const name = row.cells[3].textContent.toLowerCase();
+
+            const matchText =
+                trekName.includes(query) ||
+                role.includes(query) ||
+                name.includes(query);
+
+            const matchDate =
+                !startDate || date === startDate;
+
+            if ((query === "" || matchText) && matchDate) {
+                row.style.display = "";
+                found = true;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        const tbody = document.querySelector("table tbody");
+        const existingNoRow = document.getElementById("noResultsRow");
+
+        if (!found) {
+            if (!existingNoRow) {
+                const tr = document.createElement("tr");
+                tr.id = "noResultsRow";
+                const td = document.createElement("td");
+                td.colSpan = 6;
+                td.className = "text-center text-danger fw-bold";
+                td.textContent = "No matching records found.";
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+            }
+        } else {
+            if (existingNoRow) existingNoRow.remove();
+        }
+    }
+    function resetSearch() {
+        document.getElementById('searchBox').value = '';
+        document.getElementById('searchStartDate').value = '';
+        filterTable(); 
+    }
+</script>
+
+
+

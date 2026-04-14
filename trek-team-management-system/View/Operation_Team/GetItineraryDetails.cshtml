@@ -1,0 +1,133 @@
+﻿@* @using TTH.Areas.Super.Data.Operation_Team
+@model List<TrekDepartureItineraryDetail>
+
+<div class="container my-2">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h3 class="mb-0">Edit Itinerary</h3>
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="Edit_Itinerary" method="post">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="TrekName">Trek Name</label>
+                                        <input type="text" id="TrekName" class="form-control" value="@Model.FirstOrDefault()?.TrekName" readonly />
+                                        <input type="hidden" name="TrekId" value="@Model.FirstOrDefault()?.TrekId" />
+                                    </div>
+
+                                    <div class="form-group col-md-6" id="TrekDateGroup">
+                                        <label for="TrekDeparture">Select Trek Departure</label>
+                                        <select id="TrekDeparture" class="form-control" name="DepartureId">
+                                            <option value="">Select Departure</option>
+                                            @if (ViewBag.TrekDepartures != null && ViewBag.TrekDepartures.Count > 0)
+                                            {
+                                                foreach (var trekDeparture in ViewBag.TrekDepartures)
+                                                {
+                                                    <option value="@trekDeparture.DepartureId">
+                                                        @trekDeparture.StartDate.ToString("yyyy-MM-dd") - @trekDeparture.EndDate.ToString("yyyy-MM-dd")
+                                                    </option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option>No available departures</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="Id" value="@Model.FirstOrDefault()?.Id" />
+                        
+
+                                <div class="inputContainer" id="itineraryContainer">
+                                    @if (Model != null && Model.Any())
+                                    {
+                                        @foreach (var detail in Model.Select((value, index) => new { value, index }))
+                                        {
+                                            <div class="inputGroup mb-3" id="inputGroup-@detail.index">
+                                                <label for="day@detail.index">Day @(@detail.index + 1)</label>
+                                                <label for="heading@detail.index">Heading</label>
+                                                <input type="text" class="form-control mb-2"
+                                                       name="ItineraryDetails[@detail.index].ItineraryHeading"
+                                                       value="@detail.value.ItineraryHeading"
+                                                       placeholder="Enter trek activity" />
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p>No itinerary details available.</p>
+                                    }
+                                </div>
+
+                                <button type="button" class="btn btn-success mb-3 addButton">+</button>
+                                <button type="button" class="btn btn-danger mb-3 removeButton">-</button>
+
+                                <br />
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const itineraryContainer = document.getElementById("itineraryContainer");
+        const addButton = document.querySelector(".addButton");
+        const removeButton = document.querySelector(".removeButton");
+
+        let dayCount = itineraryContainer.querySelectorAll(".inputGroup").length;
+
+        // Function to add a new day
+        addButton.addEventListener("click", () => {
+            dayCount++;
+            const newGroup = document.createElement("div");
+            newGroup.className = "inputGroup mb-3";
+            newGroup.id = `inputGroup-${dayCount - 1}`;
+            newGroup.innerHTML = `
+                        <label for="day${dayCount - 1}">Day ${dayCount}</label>
+                        <label for="heading${dayCount - 1}">Heading</label>
+                        <input type="text" class="form-control mb-2"
+                               name="ItineraryDetails[${dayCount - 1}].ItineraryHeading"
+                               placeholder="Enter trek activity" />
+                    `;
+            itineraryContainer.appendChild(newGroup);
+        });
+
+        // Function to remove the last day
+        removeButton.addEventListener("click", () => {
+            if (dayCount > 0) {
+                const lastGroup = document.getElementById(`inputGroup-${dayCount - 1}`);
+                if (lastGroup) {
+                    itineraryContainer.removeChild(lastGroup);
+                    dayCount--;
+                }
+            } else {
+                alert("No more days to remove.");
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const trekDepartureDropdown = document.getElementById("TrekDeparture");
+
+        // Handle change event of the TrekDeparture dropdown
+        trekDepartureDropdown.addEventListener("change", function () {
+            const departureId = trekDepartureDropdown.value;
+
+            if (departureId) {
+                // Redirect to the controller action when a DepartureDate is selected
+                window.location.href = `/Operation_Team/GetItineraryDetails/${departureId}`;
+            }
+        });
+    });
+</script>
+ *@

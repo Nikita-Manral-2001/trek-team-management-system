@@ -1,0 +1,1053 @@
+﻿@model List<TTH.Models.OperationItineraryViewModel>
+@using System.Globalization
+
+
+<style>
+    /* Freeze the first column (date) */
+    .fixed-date {
+        position: sticky;
+        left: 0;
+        z-index: 100;
+        background-color: black !important; /* Ensures readability */
+        color: white !important;
+        border-right: 1px solid #ddd;
+    }
+
+    /* Freeze the second column (day) */
+    .fixed-day {
+        position: sticky;
+        left: 70px; /* Adjust based on column width */
+        z-index: 100;
+        color: white !important;
+        background-color: black !important;
+        border-right: 1px solid #ddd;
+    }
+
+    /* Optional: Freeze header row */
+    thead th {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        background: #f8f9fa;
+    }
+
+    .Teammodal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        max-height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .Teammodal-content {
+        background-color: #fff;
+        width: 600px !important;
+        height: 600px; /* Set the height */
+        padding: 20px;
+        border-radius: 5px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        overflow-y: auto; /* Allow scroll if content overflows */
+        box-sizing: border-box; /* Ensure padding doesn't exceed the set height */
+    }
+
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 14px;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+    .edit-icon {
+        width: 14px;
+        height: 14px;
+    }
+
+    .dropdown {
+        width: 100%;
+        padding: 8px;
+        margin-top: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .modal-header {
+        margin-bottom: 15px;
+    }
+
+    .modal-title {
+        margin: 0;
+        font-size: 18px;
+        color: #333;
+    }
+
+    .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .date-info {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+
+    #myDropdown {
+        width: 250px;
+    }
+
+
+
+    .assigned-member {
+        background-color: #009933 !important; /* Light green background */
+        color: #000000; /* Black text for better readability */
+    }
+
+        /* Style for when the option is selected */
+        .assigned-member:checked {
+            background-color: #006400 !important; /* Darker green when selected */
+            color: #ffffff; /* White text for better readability */
+        }
+
+        /* Style for when hovering over the option */
+        .assigned-member:hover {
+            background-color: #98FB98 !important; /* Slightly different green on hover */
+        }
+
+    .icon-group {
+        margin-left: 8px; /* Add space between text and icons */
+    }
+
+        .icon-group i {
+            cursor: pointer;
+            margin-left: 5px; /* Space between icons */
+        }
+
+
+    .red-icon {
+        color: red;
+    }
+
+    #AddedTeamMember {
+        padding: 10px; /* Adjust as needed */
+        margin: 15px; /* Adjust as needed */
+        background-color: #f0f0f0; /* Optional: Just for visibility */
+        border: 1px solid #ccc; /* Optional */
+    }
+
+    .AddBtn {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .ViewDetilsFilters {
+        position: relative;
+        left: -90px; /* This will shift the element 20px to the left */
+    }
+
+    .FilterButton {
+        position: relative;
+        top: 50px;
+    }
+
+    .green-icon {
+        color: green;
+    }
+
+    /* Red icon when no data is present */
+    .red-icon {
+        color: red;
+    }
+
+    .button-container {
+        text-align: center;
+    }
+
+    button {
+        background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        margin: 10px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+        button:hover {
+            background: linear-gradient(135deg, #3b3fbc, #7c81f9);
+            transform: scale(1.05);
+        }
+
+</style>
+
+
+
+<section class="DetailsSection">
+
+    <form asp-action="DepartureWise" method="post" id="itineraryForm">
+        <div class="container pt-1">
+            <h3 class="text-center text-success mt-5">All Trek Details</h3>
+            <div>
+                <div class="row ViewDetilsFilters ">
+
+                    <div class="form-group mt-3 text-center col-md-3">
+                        <label for="fromDate" class="fw-bold">From Date</label>
+                        <input type="date" id="fromDate" name="FromDate" class="form-control w-70 mx-auto">
+                    </div>
+
+                    <!-- To Date Input -->
+                    <div class="form-group mt-3 text-center col-md-3">
+                        <label for="toDate" class="fw-bold">To Date</label>
+                        <input type="date" id="toDate" name="ToDate" class="form-control w-70 mx-auto">
+                    </div>
+
+
+
+
+
+
+@* 
+                    <div class="form-group mt-3 text-center col-md-3">
+                        <label for="itineraryType" class="fw-bold">Choose Itinerary Type</label>
+                        <select id="itineraryType" name="itineraryType" class="form-control mt-2">
+                            <option value="">Choose Itinerary</option>
+                            <option value="Fixed">Fixed</option>
+                            <option value="Customize">Customize</option>
+                            <option value="All">All</option>
+                        </select>
+                    </div> *@
+
+
+                    <!-- Trek Dropdown -->
+                @*     <div class="form-group mt-3 TemaDropdown col-md-5">
+                        <label for="trekDropdown" class="fw-bold">Select Trek</label>
+                        <select id="trekDropdown" class="form-control " name="trekId[]" multiple>
+                            <option value="">-- Select Trek --</option>
+                            <option value="">All Trek</option>
+                            @if (ViewData["TrekList"] != null)
+                            {
+                                var trekList = (List<SelectListItem>)ViewData["TrekList"];
+                                foreach (var trek in trekList)
+                                {
+                                    if (ViewData["SelectedTrekId"] != null && trek.Value == ViewData["SelectedTrekId"].ToString())
+                                    {
+                                        <option value="@trek.Value" selected>@trek.Text</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@trek.Value">@trek.Text</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div> *@
+                    <div class="form-group text-center  col-md-1 FilterButton">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                    </div>
+                </div>
+                <!-- From Date Input -->
+                <!-- Search Button -->
+
+            </div>
+        </div>
+    </form>
+
+
+
+
+
+    <div class="button-container">
+        <button onclick="redirectDateWise()">Departure Wise</button>
+        <button onclick="redirectDepartureWise()">Trek Wise</button>
+        <button onclick="redirectemployee()">Employee Data</button>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    @if (Model != null && Model.Any(m => m.DatesWithHeadings != null && m.DatesWithHeadings.Any()))
+    {
+        <div class="mt-4 w-100">
+            <h4 class="text-center">Itinerary Details</h4>
+
+            <table class="table table-bordered mt-3" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="fixed-date">Date</th>
+                        <th class="fixed-day">Day</th>
+                        @foreach (var column in Model)
+                        {
+                            <th>Column @column.ColumnNumber</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var date in Model.First().DatesWithHeadings.Keys.OrderBy(d => d))
+                    {
+                        @*  @foreach (var AllTrekDate in Model.First().AllTrekDates
+                .Where(d => DateTime.TryParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out _))
+                .Select(d => DateTime.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture))
+                .OrderBy(d => d))
+                {
+                var displayDate = AllTrekDate.ToString("yyyy-MM-dd");
+                var parsedDate = AllTrekDate;
+                var formattedDate = DateTime.ParseExact(parsedDate.ToString("dd-MM-yyyy 00:00:00"), "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);  *@
+
+                        <tr>
+                            @*    <td class="fixed-date">@displayDate</td>
+                    <td class="fixed-day">@parsedDate.ToString("ddd")</td>  *@
+                            <td class="fixed-date">@date</td>
+                            <td class="fixed-day">@DateTime.Parse(date).ToString("ddd")</td>
+
+                            @foreach (var column in Model)
+                            {
+                                var FullCellHeading = column.DatesWithHeadings.GetValueOrDefault(date, "");
+                                var cellHeading = column.DatesWithHeadings.GetValueOrDefault(date, "");
+                                var ValcellHeading = column.DatesWithHeadings.GetValueOrDefault(date, "");
+
+                                var TitlecellHeading = column.DatesWithHeadings.GetValueOrDefault(date, "");
+                                var parts = TitlecellHeading.Split('-');
+
+                                if (parts.Length > 7)
+                                {
+                                    TitlecellHeading = string.Join("-", parts.Take(7));
+                                }
+
+                                var allDepartureId = !string.IsNullOrEmpty(FullCellHeading)
+                                ? FullCellHeading.Split('-').Last().Trim('(', ')')
+                                : "";
+
+                                bool isValidNumber = int.TryParse(allDepartureId, out int parsedDepartureId);
+
+
+                                DateTime tempDate = DateTime.ParseExact(date, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+                                DateTime finalDate = DateTime.ParseExact(tempDate.ToString("dd-MM-yyyy 00:00:00"), "dd-MM-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+
+
+
+                                string TrekIds = "";
+
+                                if (cellHeading.Contains("C -"))
+                                {
+                                    // Split the string by '-' and trim spaces
+                                    var Customizeparts = cellHeading.Split('-').Select(p => p.Trim()).ToList();
+
+                                    if (Customizeparts.Count >= 5) // Ensure at least 5 parts for valid extraction
+                                    {
+                                        // Join all data after the 4th dash
+                                        TrekIds = string.Join("-", Customizeparts.Skip(4));
+                                    }
+                                }
+
+                                int parsedTrekId = 0;
+                                bool isValidTrekId = int.TryParse(TrekIds, out parsedTrekId);
+
+
+                                var isCustomOrFixed = cellHeading.Contains("F -") || cellHeading.Contains("C -");
+                                var cellStyle = isCustomOrFixed ? "background-color: #ffcccc;" : "";
+
+                                <td style="@cellStyle" title="@TitlecellHeading ">
+                                    @{
+                                        if (!string.IsNullOrEmpty(cellHeading) && cellHeading.Contains("F -"))
+                                        {
+                                            int firstDash = cellHeading.IndexOf('-');
+                                            int secondDash = firstDash != -1 ? cellHeading.IndexOf('-', firstDash + 1) : -1;
+                                            int thirdDash = secondDash != -1 ? cellHeading.IndexOf('-', secondDash + 1) : -1;
+                                            int fourthDash = thirdDash != -1 ? cellHeading.IndexOf('-', thirdDash + 1) : -1;
+
+                                            if (thirdDash != -1 && fourthDash != -1)
+                                            {
+                                                // Keep the part before third dash and after fourth dash
+                                                ValcellHeading = cellHeading.Substring(0, thirdDash) + cellHeading.Substring(fourthDash);
+                                            }
+                                        }
+
+                                        else if (!string.IsNullOrEmpty(cellHeading) && cellHeading.Contains("C -"))
+                                        {
+                                            int firstDash = cellHeading.IndexOf('-');
+                                            int secondDash = firstDash != -1 ? cellHeading.IndexOf('-', firstDash + 1) : -1;
+                                            int thirdDash = secondDash != -1 ? cellHeading.IndexOf('-', secondDash + 1) : -1;
+
+                                            if (secondDash != -1 && thirdDash != -1)
+                                            {
+                                                // Keep the part before second dash and after third dash
+                                                ValcellHeading = cellHeading.Substring(0, secondDash) + cellHeading.Substring(thirdDash);
+                                            }
+                                        }
+
+
+
+                                    }
+
+
+
+                                    <span>
+                                        @ValcellHeading?.Substring(0, Math.Min(23, ValcellHeading.Length))
+                                    </span>
+                                    @{
+                                        var DepartureIds = ViewData["DepartureId"] as List<int> ?? new List<int>();
+                                        var CustomizeTrekId = ViewData["CustomizeTrekId"] as List<int> ?? new List<int>();
+
+                                        var CustomizeStartDate = ViewData["CustmoizeStartDate"] as List<DateTime> ?? new List<DateTime>();
+
+
+                                    }
+
+
+
+
+                                    @if (isCustomOrFixed)
+                                    {
+
+
+                                        <span class="icon-group">
+                                            <i class=" red-icon AddBtn edit-btn"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#TeamModal"
+                                               data-heading="@FullCellHeading"
+                                               data-date="@date"><b>+</b></i>
+
+                                            <input type="hidden" name="heading" value="@FullCellHeading" />
+                                            <input type="hidden" name="date" value="@date" />
+                                            <input type="hidden" name="departureId" value="@column.DepartureId" />
+
+
+
+
+
+
+
+                                            @if (cellHeading.Contains("F -") && isValidNumber && DepartureIds.Contains(parsedDepartureId))
+                                            {
+                                                <i class="fas fa-eye green-icon view-btn"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#TeamViewModal"
+                                                   data-heading="@FullCellHeading"
+                                                   data-date="@date"></i>
+                                            }
+                                            else if (cellHeading.Contains("C -") && CustomizeStartDate.Contains(finalDate) && isValidTrekId && CustomizeTrekId.Contains(parsedTrekId))
+                                            {
+
+                                                <i class="fas fa-eye green-icon view-btn"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#TeamViewModal"
+                                                   data-heading="@FullCellHeading"
+                                                   data-date="@date"></i>
+
+                                            }
+
+                                            else
+                                            {
+                                                <i class="fas fa-eye red-icon view-btn"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#TeamViewModal"
+                                                   data-heading="@FullCellHeading"
+                                                   data-date="@date"></i>
+                                            }
+
+
+
+
+
+
+
+
+                                            <a target="_blank" asp-action="TransportUserDetails" asp-controller="ManageBooking" asp-route-date="@date" asp-route-heading="@cellHeading"> <i class="fas fa-user red-icon TrekkerViewButton" data-date="@date" data-heading="@cellHeading"></i></a>
+
+
+
+                                        </span>
+
+                                    }
+                                </td>
+
+                            }
+                        </tr>
+                        // }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    }
+
+
+
+
+
+    <div class="modal Teammodal fade" id="TeamModal" tabindex="-1" aria-labelledby="TeamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content Teammodal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TeamModalLabel">Add Team</h5>
+
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="row">
+                    <div class="modal-body AllDropdownforTeam col-md-6">
+                        <p id="HeadingmodalContent"></p>
+                        <p id="modalContent">Select a role:</p>
+
+                        <div class="mb-3">
+
+                            <select id="myDropdown" class="form-select" name="TeamRoll">
+                                <option value="">-- Select Position --</option>
+                                <option value="BCM">BCM</option>
+                                <option value="TL">TL</option>
+                                <option value="ATL">ATL</option>
+                                <option value="Chef">Chef</option>
+                                <option value="A-Chef">A-Chef</option>
+                                <option value="Helper">Helper</option>
+                                <option value="Guide">Guide</option>
+                                <option value="CM">CM</option>
+
+                            </select>
+                        </div>
+                    </div>
+
+
+                    <form asp-action="GetTeamMembers" method="post" id="AllTLForm" class="col-md-6">
+
+                        <div class="mb-3 Teamdropdown" id="teamMembersContainer" style="display: none;">
+                            <label for="teamMembers" class="form-label">Select Team Member:</label>
+                            <select id="teamMembers" class="form-select " name="TeamMember">
+                                <option value="">Select team member</option>
+
+
+                            </select>
+                        </div>
+
+
+
+                        <div class="mb-3" id="freelancingInputContainer" style="display: none;">
+                            <label for="freelancingText" class="form-label">Enter Details:</label>
+                            <input type="text" id="freelancingText" class="form-control" name="FreelancingDetails" placeholder="Enter details">
+                        </div>
+
+                        <input type="hidden" id="headingInput" name="Heading" />
+                        <input type="hidden" id="dateInput" name="Date" />
+                        <input type="hidden" id="selectedTeamMemberName" name="selectedTeamMemberName" />
+                        <input type="hidden" id="selectedRole" name="selectedRole" />
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary save-changes">Save changes</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="modal TeamViewmodal fade" id="TeamViewModal" tabindex="-1" aria-labelledby="TeamModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content Teammodal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="TeamModalLabel">Team Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body AllDropdownforTeam">
+                    <!-- Trek Name and Date -->
+                    <p id="ViewHeadingmodalContent"></p>
+
+                    <!-- Container for dynamically inserted team members -->
+                    <p id="AddedTeamMember"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+</section>
+
+
+
+
+
+<script>
+    function redirectDateWise() {
+        // Replace these static values with dynamic ones if needed (e.g., from date pickers)
+        var fromDate = '01-01-0001 00:00:00';
+        var toDate = '01-01-0001 00:00:00';
+        window.location.href = `/Super/ViewOperationTeamDetails/Index?FromDate=${fromDate}&ToDate=${toDate}`;
+    }
+
+    function redirectDepartureWise() {
+        window.location.href = `/Super/ViewOperationTeamDetails/DepartureWise`;
+    }
+
+
+
+    function redirectemployee() {
+        window.location.href = `/Super/ViewOperationTeamDetails/AllEmployeeData`;
+    }
+
+
+
+
+
+    // function handleDropdownChange() {
+    //     var selectedValue = document.getElementById('filterDropdown').value;
+
+    //     if (selectedValue === 'datewise') {
+    //         // You can later replace these with dynamic values from date pickers
+    //         var fromDate = '01-01-0001 00:00:00'; // Example static FromDate
+    //         var toDate = '01-01-0001 00:00:00';   // Example static ToDate
+
+    //         window.location.href = `/Super/ViewOperationTeamDetails/Index?FromDate=${fromDate}&ToDate=${toDate}`;
+    //     }
+    //     else if (selectedValue === 'departurewise') {
+    //         // Redirect to Departure Wise page (you define this separately)
+    //         window.location.href = `/Super/ViewOperationTeamDetails/DepartureWise`; // Example URL
+    //     }
+    // }
+</script>
+
+
+
+
+<script>
+    $(document).ready(function () {
+        $("#AllTLForm").submit(function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            $.ajax({
+                url: $(this).attr("action"),
+                type: "POST",
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message); // Show success message
+                        $("#AllTLForm")[0].reset(); // Reset the form
+                        $("#teamMembersContainer, #freelancingInputContainer").hide(); // Hide fields if needed
+                    } else {
+                        alert("Error: Could not save data."); // Handle errors
+                    }
+                },
+                error: function () {
+                    alert("Something went wrong! Please try again.");
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    window.removeMember = function (memberId, date, heading, designation, teamMemberName) {
+        if (!confirm(`Are you sure you want to remove ${teamMemberName}?`)) {
+            return;
+        }
+
+        fetch('/super/ViewOperationTeamDetails/DeleteMember', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                date: date,
+                heading: heading,
+                designation: designation,
+
+                teamMemberName: teamMemberName,
+
+
+
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log("Member deleted successfully:", data.message);
+                    alert("success: " + data.message);
+                    document.getElementById(memberId).remove();
+                } else {
+                    console.error("Error deleting member:", data.message);
+                    alert("Error: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                alert("Failed to delete member.");
+            });
+    };
+</script>
+
+
+
+
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Handle Edit Button Clicks
+        document.querySelectorAll(".edit-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let heading = this.getAttribute("data-heading") || "";
+                let date = this.getAttribute("data-date") || "";
+
+                let parts = heading.split("-");
+
+                // Remove first three elements
+                let afterSecondHyphen = parts.slice(2).join("-");
+
+                // Remove the fourth element (index 1 in this new array)
+
+                let finalParts = afterSecondHyphen.split("-");
+                let trekName = finalParts.slice(0, -1).join("-");
+
+                console.log(trekName);
+
+
+
+                // Ensure modal content exists before updating
+                const modalContent = document.getElementById("HeadingmodalContent");
+                if (modalContent) {
+                    modalContent.innerHTML = `<strong>${trekName}</strong><br><strong>${date}</strong>`;
+                }
+                document.getElementById("headingInput").value = heading;
+                document.getElementById("dateInput").value = date;
+            });
+        });
+
+
+
+        document.querySelectorAll(".view-btn").forEach(button => {
+            button.addEventListener("click", function () {
+                let heading = this.getAttribute("data-heading") || "";
+                let date = this.getAttribute("data-date") || "";
+
+                console.log("Heading:", heading);
+                console.log("Date:", date);
+
+                if (!heading || !date) {
+                    console.error("Heading or Date is missing");
+                    return;
+                }
+
+                const modalContent = document.getElementById("ViewHeadingmodalContent");
+                const AddedTeamMember = document.getElementById("AddedTeamMember"); // Targeting the <p> tag
+
+                if (modalContent) {
+                    let parts = heading.split("-");
+                    let afterSecondHyphen = parts.slice(2).join("-");
+                    let finalParts = afterSecondHyphen.split("-");
+                    let trekName = finalParts.slice(0, -1).join("-");
+                    modalContent.innerHTML = `<strong>${trekName} (${date})</strong>`;
+                }
+
+                document.getElementById("headingInput").value = heading;
+                document.getElementById("dateInput").value = date;
+
+                fetch('/super/ViewOperationTeamDetails/GetViewTeam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ heading: heading, date: date })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Full Response from Controller:', data);
+
+                        if (!data.success) {
+                            console.error("Error in response:", data.message);
+                            modalContent.innerHTML += "<p>Error fetching data.</p>";
+                            return;
+                        }
+
+                        if (data.teamMembers && Array.isArray(data.teamMembers)) {
+                            console.log("Extracted Team Members Array:", data.teamMembers);
+
+                            if (data.teamMembers.length > 0) {
+                                let teamDetails = data.teamMembers.map((member, index) =>
+                                    `<span id="member-${index}">
+                                    ${member.designation} - ${member.teamMemberName}
+                                    <button onclick="removeMember('member-${index}', '${date}', '${heading}', '${member.designation}', '${member.teamMemberName}')"
+                                        style="color: red; border: none; padding: 2px 5px; cursor: pointer; margin-left: 5px;">
+                                        ❌
+                                    </button>
+                                </span><br>`
+                                ).join("");
+
+                                console.log("Generated Team Details HTML:", teamDetails);
+
+                                // Insert team details into the <p> tag
+                                AddedTeamMember.innerHTML = teamDetails;
+                            } else {
+                                console.log("No valid team members found.");
+                                AddedTeamMember.innerHTML = "<p>No team members available.</p>";
+                            }
+                        } else {
+                            console.error("teamMembers is not an array:", data.teamMembers);
+                            AddedTeamMember.innerHTML = "<p>Invalid response format.</p>";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Fetch Error:', error);
+                        AddedTeamMember.innerHTML = "<p>Error loading team members.</p>";
+                    });
+
+            });
+        });
+
+
+        // selectedTeamMemberName
+
+        // Handle Role Selection Change
+        const roleDropdown = document.getElementById('myDropdown');
+
+        if (roleDropdown) {
+            roleDropdown.addEventListener('change', function () {
+                const selectedRole = this.value;
+
+
+                document.getElementById('selectedRole').value = selectedRole;
+
+                const teamMembersContainer = document.getElementById('teamMembersContainer');
+                const teamMembersDropdown = document.getElementById('teamMembers');
+                const freelancingInputContainer = document.getElementById("freelancingInputContainer");
+
+                const freelancingTextInput = document.getElementById("freelancingText");
+
+                if (!teamMembersContainer || !teamMembersDropdown) {
+                    console.warn("Dropdown elements not found!");
+                    return;
+                }
+
+                if (!selectedRole) {
+                    teamMembersDropdown.innerHTML = '<option value="">Select a role first</option>';
+                    teamMembersContainer.style.display = 'none';
+                    return;
+                }
+
+                teamMembersContainer.style.display = 'block';
+                teamMembersDropdown.innerHTML = '<option value="">Loading team members...</option>';
+
+                fetch(`/super/ViewOperationTeamDetails/GetTeamMembers?position=${encodeURIComponent(selectedRole)}`)
+
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("API Response:", data);
+
+                        teamMembersDropdown.innerHTML = '<option value="">Select team member</option>';
+
+                        // Check if data is an array directly
+                        if (Array.isArray(data) && data.length > 0) {
+                            data.forEach(member => {
+                                console.log("Processing member:", member); // Log each member being processed
+
+                                if (member && member.text) {
+                                    const option = document.createElement('option');
+                                    option.value = member.value; // Ensure this matches the API response
+                                    option.textContent = member.text;
+
+                                    if (member.isAssigned) {
+                                        option.classList.add('assigned-member');
+                                    }
+
+                                    teamMembersDropdown.appendChild(option);
+                                }
+                            });
+                        } else {
+                            teamMembersDropdown.innerHTML = '<option value="">No team members available</option>';
+                        }
+
+                        // Adding "Freelancing" and "Fixed" options
+                        const freelancingOption = document.createElement('option');
+                        freelancingOption.value = 'Freelancing';
+                        freelancingOption.textContent = 'Freelancing';
+                        teamMembersDropdown.appendChild(freelancingOption);
+
+                        const fixedOption = document.createElement('option');
+                        fixedOption.value = 'Fixed';
+                        fixedOption.textContent = 'Fixed';
+                        teamMembersDropdown.appendChild(fixedOption);
+
+
+                        teamMembersDropdown.addEventListener("change", function () {
+                            if (this.value === "Freelancing") {
+                                freelancingInputContainer.style.display = "block"; // Show input field
+                            } else {
+                                freelancingInputContainer.style.display = "none"; // Hide input field
+                            }
+                        });
+                    })
+
+                    .catch(error => {
+                        console.error('Error loading team members:', error);
+                        teamMembersDropdown.innerHTML = '<option value="">Error loading team members</option>';
+                    });
+            });
+        }
+
+        const teamMembersDropdown = document.getElementById("teamMembers");
+        if (teamMembersDropdown) {
+            teamMembers.addEventListener('change', function () {
+                const selectedTeamMemberName = this.value;
+
+
+                document.getElementById('selectedTeamMemberName').value = selectedTeamMemberName;
+
+
+
+            });
+        }
+
+
+        // document.getElementById("AllTLForm").addEventListener("submit", function (event) {
+        //     // Get both the team member and role selections
+        //     let teamMembersDropdown = document.getElementById("teamMembers");
+        //     let roleDropdown = document.getElementById("myDropdown");
+        //     let freelancingInputContainer = document.getElementById("freelancingInputContainer");
+        //     let freelancingTextInput = document.getElementById("freelancingText");
+
+        //     let selectedOption = teamMembersDropdown.options[teamMembersDropdown.selectedIndex];
+        //     let selectedRole = roleDropdown.value;
+
+        //     // Validate selections
+        //     if (!selectedOption || selectedOption.value === "") {
+        //         alert("Please select a team member before submitting.");
+        //         event.preventDefault();
+        //         return;
+        //     }
+
+        //     if (!selectedRole) {
+        //         alert("Please select a role before submitting.");
+        //         event.preventDefault();
+        //         return;
+        //     }
+
+        //     let selectedTeamMemberName = selectedOption.value.trim();
+        //     if (selectedTeamMemberName === "Freelancing") {
+        //         if (!freelancingTextInput.value.trim()) {
+        //             alert("Please enter details for Freelancing.");
+        //             event.preventDefault();
+        //             return;
+        //         }
+        //         selectedTeamMemberName = freelancingTextInput.value.trim(); // Save input value
+        //     }
+        //     // Handle team member hidden input
+        //     let teamMemberInput = document.getElementById("selectedTeamMemberName");
+        //     if (!teamMemberInput) {
+        //         teamMemberInput = document.createElement("input");
+        //         teamMemberInput.type = "hidden";
+        //         teamMemberInput.id = "selectedTeamMemberName";
+        //         // teamMemberInput.name = "TeamMember";
+        //         document.getElementById("AllTLForm").appendChild(teamMemberInput);
+        //     }
+        //     teamMemberInput.value = selectedTeamMemberName;
+
+        //     // Handle role hidden input
+        //     let roleInput = document.getElementById("selectedRole");
+        //     if (!roleInput) {
+        //         roleInput = document.createElement("input");
+        //         roleInput.type = "hidden";
+        //         roleInput.id = "selectedRole";
+        //         roleInput.name = "selectedRole";
+        //         document.getElementById("AllTLForm").appendChild(roleInput);
+        //     }
+        //     roleInput.value = selectedRole;
+        // });
+
+
+
+
+
+
+
+    });
+
+
+
+
+
+</script>
+
+
+<script>
+    document.getElementById('toDate').addEventListener('change', function () {
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = this.value;
+
+        if (fromDate && toDate) {
+            fetch(`/super/ViewOperationTeamDetails/GetDateWiseTreks?FromDate=${fromDate}&ToDate=${toDate}`)
+                .then(response => response.json())
+                .then(data => {
+                    const trekDropdown = document.getElementById('trekDropdown');
+                    trekDropdown.innerHTML = '<option value="">-- Select Trek --</option>';
+
+                    if (data && data.length > 0) {
+                        data.forEach(trek => {
+                            const option = document.createElement('option');
+                            option.value = trek.value;
+                            option.textContent = trek.text;
+                            trekDropdown.appendChild(option);
+                        });
+                    } else {
+                        trekDropdown.innerHTML += '<option value="">No treks found</option>';
+                    }
+                })
+                .catch(error => console.error('Error fetching treks:', error));
+        }
+    });
+
+</script>
+// <script>
+       //     function updateFormAction() {
+       //         var form = document.getElementById("searchForm");
+       //         var selectedValue = document.getElementById("formType").value;
+       //         var fromDate = document.getElementById("FromDate").value || "01-01-0001 00:00:00";
+       //         var toDate = document.getElementById("ToDate").value || "01-01-0001 00:00:00";
+
+       //         if (selectedValue === "Datewise") {
+       //             form.action = `/super/ViewOperationTeamDetails/Index?FromDate=${fromDate}&ToDate=${toDate}`;
+       //         } else if (selectedValue === "Departurewise") {
+       //             form.action = "/super/ViewOperationTeamDetails/DepartureWise";
+       //         } else {
+       //             form.action = "#"; // default or do nothing
+       //         }
+       //     }
+       // </script>
+
+

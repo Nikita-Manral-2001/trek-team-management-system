@@ -1,0 +1,120 @@
+﻿
+ @model TTH.Areas.Super.Data.Operation_Team.Add_Team
+
+<div class="container my-2">
+    <div class="row justify-content-center">
+        <div class="col-md-12 ">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h3 class="mb-0">Add Team</h3>
+                        </div>
+                        @if (ViewBag.IsSuccess)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                You have added new product successfully.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" asp-action="Add_Team" asp-controller="Operation_Team">
+                                  <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label"><b>Emp Id</b></label>
+                                <input asp-for="EmpId" class="form-control form-control-sm" />
+                                <span asp-validation-for="EmpId" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label"><b>Name</b></label>
+                                <input asp-for="Name" class="form-control form-control-sm" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                        <label for="PhoneNo">Phone Number</label>
+                                        <input type="t" class="form-control" id="PhoneNo" name="PhoneNo" required>
+                                        <span asp-validation-for="PhoneNo" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label"><b>Email</b></label>
+                                <input asp-for="Email" class="form-control form-control-sm" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label"><b>Date Of Birth</b></label>
+                                <input asp-for="DOB" type="date" class="form-control form-control-sm" />
+                                <span asp-validation-for="DOB" class="text-danger"></span>
+                            </div>
+
+                         
+                            <div class="col-md-4">
+                                <label class="form-label"><b>Gender</b></label>
+                                <select asp-for="Gender" class="form-select form-select-sm">
+                                    <option>Male</option>
+                                    <option>Female</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                          
+
+                            <div class="col-md-6">
+                                <label class="form-label"><b>Course</b></label>
+                                <textarea class="form-control summerTextarea" asp-for="Cource" name="Cource" rows="3"></textarea>
+                                <span asp-validation-for="Cource" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label"><b>Education</b></label>
+                                <textarea class="form-control summerTextarea" asp-for="Education" name="Education" rows="3"></textarea>
+                                <span asp-validation-for="Education" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label"><b>Position</b></label>
+                                <input asp-for="Position" class="form-control form-control-sm" />
+                                <span asp-validation-for="Position" class="text-danger"></span>
+                            </div> 
+                            <div class="col-md-4">
+                                <label class="form-label"><b>Date Of Joining</b></label>
+                                <input asp-for="DateOfJoining" type="date" class="form-control form-control-sm" />
+                                <span asp-validation-for="DateOfJoining" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label"><b>Location</b></label>
+                                <select class="form-select form-select-sm" name="Location" required>
+                                    <option disabled selected>Select Location</option>
+                                            <option >Office Staff</option>
+                                            <option >Field Staff</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label"><b>Profile</b></label>
+                                <input asp-for="Photo" type="file" class="form-control form-control-sm" />
+                                <span asp-validation-for="Photo" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label"><b>Upload Id</b></label>
+                                <input asp-for="Upload_Id" type="file" multiple class="form-control form-control-sm" />
+                                <span asp-validation-for="Upload_Id" class="text-danger"></span>
+                            </div>
+                        </div>
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-danger btn-lg">Submit</button>
+                        </div>
+                                
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

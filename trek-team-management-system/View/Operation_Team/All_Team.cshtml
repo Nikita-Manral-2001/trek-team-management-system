@@ -1,0 +1,103 @@
+﻿@model IEnumerable<TTH.Areas.Super.Data.Operation_Team.Add_Team>
+<section class="DetailsSection">
+    <div class="">
+        <h3 class="text-center text-success">
+           Operation Team Member
+        </h3>
+
+      
+       
+    </div>
+    <table id="myTable">
+        <thead>
+            <tr>
+                <th>EmpId</th>
+                <th>Name</th>
+                <th>Photo</th>
+                <th>Phone No</th>
+                <th>Email</th>
+                <th>Date Of Joining</th>
+                <th>Courses</th>
+                <th>Education</th>
+                <th>Date Of Birth</th>
+                <th>Location</th>
+                <th>Position</th>
+                <th>Gender</th>
+                <th>Id</th>
+                <th>Trek Assign</th>
+                <th>Trek done</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var team in Model)
+            {
+                <tr>
+                    <td>@team.EmpId</td>
+                    <td>@team.Name</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(team.PhotoPath))
+                        {
+                            <img src="@team.PhotoPath" alt="Photo" class="img-thumbnail" style="width: 100px; height: auto;">
+                        }
+                    </td>
+                    <td>@team.PhoneNo</td>
+                    <td>@team.Email</td>
+                    <td>@team.DateOfJoining?.ToString("yyyy-MM-dd")</td>
+                    <td>@team.Cource</td>
+                    <td>@team.Education</td>
+                    <td>@team.DOB?.ToString("yyyy-MM-dd")</td>
+                    <td>@team.Location</td>
+                    <td>@team.Position</td>
+                    <td>@team.Gender</td>
+                    <td>
+                        <a href="@Url.Action("DownloadFiles", "Operation_Team", new { id = team.Id })" class="btn btn-warning btn-sm">
+                            <i class="fa fa-download"></i> 
+                        </a>
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <div class="d-flex flex-column">
+
+
+
+                            <div class="d-flex justify-content-between">
+                                <!-- Edit button with green color -->
+                                <a href="@Url.Action("Edit_Team", "Operation_Team", new { id = team.Id })" class="btn btn-success btn-sm me-2">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <!-- Delete button with red color -->
+                                <form asp-action="Delete_Team" asp-controller="Operation_Team" asp-route-id="@team.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+
+
+                        </div>
+                    </td>
+
+
+                </tr>
+            }
+        </tbody>
+    </table>
+    </section>
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+

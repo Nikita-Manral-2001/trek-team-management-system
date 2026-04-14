@@ -1,0 +1,120 @@
+﻿@model TTH.Areas.Super.Models.Operation_Team.TrekAssignmentToEmplyeeViewModel
+
+<style>
+    .fixed-date {
+        position: sticky;
+        left: 0;
+        z-index: 100;
+        background-color: black !important; /* Ensures readability */
+        color: white !important;
+        border-right: 1px solid #ddd;
+    }
+
+    .button-container {
+        text-align: center;
+    }
+
+    button {
+        background: linear-gradient(135deg, #4e54c8, #8f94fb);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        margin: 10px;
+        font-size: 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+
+        button:hover {
+            background: linear-gradient(135deg, #3b3fbc, #7c81f9);
+            transform: scale(1.05);
+        }
+
+</style>
+
+<section class="DetailsSection">
+
+    <div class="button-container">
+        <button onclick="redirectDateWise()">Departure Wise</button>
+        <button onclick="redirectDepartureWise()">Trek Wise</button>
+        <button onclick="redirectemployee()">Employee Data</button>
+    </div>
+    <table class="table table-bordered mt-3" id="myTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                @for (int i = 0; i < Model.EmployeeNames.Count; i++)
+                {
+                    <th>
+                        @Model.EmployeeNames[i] <br />
+                        <span style="font-size: small; color: gray;">@Model.EmployeesDesignation[i]</span>
+                    </th>
+                }
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var date in Model.TrekDates)
+            {
+                var trimmedDate = date.Trim();  
+                <tr>
+                    <td class="fixed-date">@trimmedDate</td>
+                    @foreach (var name in Model.EmployeeNames)
+                    {
+                        <td>
+                            @{
+                                var heading = Model.Assignments.ContainsKey(trimmedDate) &&
+                                Model.Assignments[trimmedDate].ContainsKey(name)
+                                ? Model.Assignments[trimmedDate][name]
+                                : "";
+                            }
+                            @heading
+                        </td>
+                    }
+                </tr>
+            }
+
+        </tbody>
+    </table>
+</section>
+
+<script>
+    function redirectDateWise() {
+        // Replace these static values with dynamic ones if needed (e.g., from date pickers)
+        var fromDate = '01-01-0001 00:00:00';
+        var toDate = '01-01-0001 00:00:00';
+        window.location.href = `/Super/ViewOperationTeamDetails/Index?FromDate=${fromDate}&ToDate=${toDate}`;
+    }
+
+    function redirectDepartureWise() {
+        window.location.href = `/Super/ViewOperationTeamDetails/DepartureWise`;
+    }
+
+
+
+    function redirectemployee() {
+        window.location.href = `/Super/ViewOperationTeamDetails/AllEmployeeData`;
+    }
+
+
+
+
+
+    // function handleDropdownChange() {
+    //     var selectedValue = document.getElementById('filterDropdown').value;
+
+    //     if (selectedValue === 'datewise') {
+    //         // You can later replace these with dynamic values from date pickers
+    //         var fromDate = '01-01-0001 00:00:00'; // Example static FromDate
+    //         var toDate = '01-01-0001 00:00:00';   // Example static ToDate
+
+    //         window.location.href = `/Super/ViewOperationTeamDetails/Index?FromDate=${fromDate}&ToDate=${toDate}`;
+    //     }
+    //     else if (selectedValue === 'departurewise') {
+    //         // Redirect to Departure Wise page (you define this separately)
+    //         window.location.href = `/Super/ViewOperationTeamDetails/DepartureWise`; // Example URL
+    //     }
+    // }
+</script>

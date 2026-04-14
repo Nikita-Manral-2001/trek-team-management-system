@@ -1,0 +1,930 @@
+﻿@using TTH.Areas.Super.Data.Operation_Team
+@model TLForm
+
+@{
+    var rating = Model?.CampManagmentRatingTL?.FirstOrDefault();
+}
+
+<style>
+
+    .star-rating {
+        direction: rtl; /* Right to left for proper star alignment */
+        display: flex;
+        gap: 5px;
+    }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 24px;
+            cursor: pointer;
+            color: #ddd; /* Default gray */
+            transition: color 0.2s;
+        }
+
+          .star-rating input:checked ~ label {
+            color: gold;
+        }
+
+
+            /* Highlight stars on hover */
+          /*   .star-rating label:hover,
+            .star-rating label:hover ~ label {
+                color: gold;
+            } */
+
+        /* Highlight selected stars correctly in reverse layout */
+        .star-rating input:checked ~ label {
+            color: gold;
+        }
+
+
+
+    .d-flex {
+        display: flex;
+    }
+
+    .gap-3 {
+        gap: 10px;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+
+    .form-label {
+        margin-bottom: 0;
+    }
+</style>
+
+
+<div class="container my-2">
+    <div class="row justify-content-center">
+        <div class="col-md-12 ">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h3 class="mb-0">TL Form</h3>
+
+
+                            @if (Model.TrekName != null)
+                            {
+                                <p>@Model.TrekName (@Convert.ToDateTime(Model.StartDate).ToString("dd-MM-yyyy") - @Convert.ToDateTime(Model.EndDate).ToString("dd-MM-yyyy"))</p>
+                            }
+
+                            else
+                            {
+                                <p>No participant data available.</p>
+                            }
+                        </div>
+
+                        <div class="card-body">
+                            <form method="post" id="tLForm" asp-action="SaveEditTLForm" asp-controller="ViewOperationTeamDetails">
+                                @if (Model.TrekName != null)
+                                {
+
+                                    <input type="hidden" asp-for="TrekName" value="@Model.TrekName" />
+                                    <input type="hidden" asp-for="TrekId" value="@Model.TrekId" />
+                                    <input type="hidden" asp-for="DepartureId" value="@Model.DepartureId" />
+                                    <input type="hidden" asp-for="StartDate" value="@Model.StartDate" />
+                                    <input type="hidden" asp-for="EndDate" value="@Model.EndDate" />
+                                  @*   <input type="hidden" asp-for="Batch" value="@Model.Batch" /> *@
+                                    <input type="hidden" asp-for="FirstName" value="@Model.FirstName" />
+                                    <input type="hidden" asp-for="LastName" value="@Model.LastName" />
+                                
+                                    <input type="hidden" asp-for="Email" value="@Model.Email" />
+                                   
+
+
+                                }
+
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+
+                                            First Day Briefing by Trek Leader
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="TLBriefing" class="form-check-input" type="radio" id="Yes" value="Yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="TLBriefing" class="form-check-input" type="radio" id="No" value="No">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Ams & CPR Lecture/Discussion
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="AmsCPRLecture" class="form-check-input" type="radio" id="Yes" value="Yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="AmsCPRLecture" class="form-check-input" type="radio" id="No" value="No">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Local Flora & Fauna Lecture/Discussion
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="FloraFaunaLecture" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="FloraFaunaLecture" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            SOS Signal Lecture/Discussion
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="SOSSignalLecture" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="SOSSignalLecture" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Terminology Lecture/Discussion
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="TerminologyLecture" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="TerminologyLecture" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Random Topic Lecture/Discussion
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="RandomTopicLecture" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="RandomTopicLecture" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            BP Check First Day
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="BPCheck" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="BPCheck" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Oxygen Check every day
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="OxygenCheck" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="OxygenCheck" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Health Feedback in the morning
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="HealthFeedbackMorning" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="HealthFeedbackMorning" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+
+
+                                            Health Feedback after dinner
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="HealthFeedbackAfterDinner" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="HealthFeedbackAfterDinner" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Debriefing
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="Debriefing" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="Debriefing" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Oxygen Cylinder & Rope taken with trekker on summit day?
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="OxygenCylinderAndRopeOnsummit" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="OxygenCylinderAndRopeOnsummit" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Meals and evening tea accompanied with trekkers
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="MealsAndEveningTea" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="MealsAndEveningTea" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Clean drive, Camp and nearby place cleaning activity
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="CampCleanDrive" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="CampCleanDrive" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Hot Lunch served with Table
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="HotLunchServed" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="HotLunchServed" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Hot Tea served at summit with Table
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="HotTeaServed" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="HotTeaServed" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Camp Management
+                                        </b>
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+
+                                            <label class="form-check-label">1 = Poor, 2 = Fair, 3 = Good, 4 = Very Good, 5 = Excellent</label>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <div class="d-flex flex-column gap-3">
+
+
+
+
+                                        <!-- Toilet Tent Rating -->
+                                        <div class="d-flex gap-4 align-items-center">
+                                            <label class="form-label d-block">Toilet Tent</label>
+                                            <div class="star-rating">
+                                                <input type="radio" id="toilet1" name="CampManagmentRatingTL[0].toiletRating" value="5" @(rating?.toiletRating == 5 ? "checked" : "") />
+                                                <label for="toilet1">&#9733;</label>
+                                               
+                                              
+
+                                                <input type="radio" id="toilet2" name="CampManagmentRatingTL[0].toiletRating" value="4" @(rating?.toiletRating == 4 ? "checked" : "")  />
+                                                <label for="toilet2">&#9733;</label>
+
+                                                <input type="radio" id="toilet3" name="CampManagmentRatingTL[0].toiletRating" value="3" @(rating?.toiletRating == 3 ? "checked" : "") />
+                                                <label for="toilet3">&#9733;</label>
+
+                                                <input type="radio" id="toilet4" name="CampManagmentRatingTL[0].toiletRating" value="2" @(rating?.toiletRating == 2 ? "checked" : "") />
+                                                <label for="toilet4">&#9733;</label>
+
+                                                <input type="radio" id="toilet5" name="CampManagmentRatingTL[0].toiletRating" value="1" @(rating?.toiletRating == 1 ? "checked" : "") />
+                                                <label for="toilet5">&#9733;</label>
+                                            </div>
+                                            <input type="hidden" id="toiletRatingValue" name="CampManagmentRatingTL[0].toiletRating" value="0" />
+                                        </div>
+
+
+
+
+                                        <div class="d-flex gap-4 align-items-center">
+                                            <label class="form-label d-block">Dining Tent</label>
+                                            <div class="star-rating">
+                                                <input type="radio" id="Dining1" name="CampManagmentRatingTL[0].DiningTentRating" value="5" @(rating?.DiningTentRating == 5 ? "checked" : "") />
+                                                <label for="Dining1">&#9733;</label>
+
+                                                <input type="radio" id="Dining2" name="CampManagmentRatingTL[0].DiningTentRating" value="4" @(rating?.DiningTentRating == 4 ? "checked" : "") />
+                                                <label for="Dining2">&#9733;</label>
+
+                                                <input type="radio" id="Dining3" name="CampManagmentRatingTL[0].DiningTentRating" value="3" @(rating?.DiningTentRating == 3 ? "checked" : "") />
+                                                <label for="Dining3">&#9733;</label>
+
+                                                <input type="radio" id="Dining4" name="CampManagmentRatingTL[0].DiningTentRating" value="2" @(rating?.DiningTentRating == 2 ? "checked" : "") />
+                                                <label for="Dining4">&#9733;</label>
+
+                                                <input type="radio" id="Dining5" name="CampManagmentRatingTL[0].DiningTentRating" value="1" @(rating?.DiningTentRating == 1 ? "checked" : "") />
+                                                <label for="Dining5">&#9733;</label>
+                                            </div>
+                                            <input type="hidden" id="DiningTentRatingValue" name="CampManagmentRatingTL[0].DiningTentRating" value="0" />
+                                        </div>
+
+
+                                        <div class="d-flex gap-4 align-items-center">
+                                            <label class="form-label d-block">Kitchen Tent</label>
+                                            <div class="star-rating">
+                                                <input type="radio" id="Kitchen1" name="CampManagmentRatingTL[0].KitchenTentRating" value="5" @(rating?.KitchenTentRating == 5 ? "checked" : "") />
+                                                <label for="Kitchen1">&#9733;</label>
+
+                                                <input type="radio" id="Kitchen2" name="CampManagmentRatingTL[0].KitchenTentRating" value="4" @(rating?.KitchenTentRating == 4 ? "checked" : "") />
+                                                <label for="Kitchen2">&#9733;</label>
+
+                                                <input type="radio" id="Kitchen3" name="CampManagmentRatingTL[0].KitchenTentRating" value="3" @(rating?.KitchenTentRating == 3 ? "checked" : "") />
+                                                <label for="Kitchen3">&#9733;</label>
+
+                                                <input type="radio" id="Kitchen4" name="CampManagmentRatingTL[0].KitchenTentRating" value="2" @(rating?.KitchenTentRating == 2 ? "checked" : "") />
+                                                <label for="Kitchen4">&#9733;</label>
+
+                                                <input type="radio" id="Kitchen5" name="CampManagmentRatingTL[0].KitchenTentRating" value="1" @(rating?.KitchenTentRating == 1 ? "checked" : "") />
+                                                <label for="Kitchen5">&#9733;</label>
+                                            </div>
+                                            <input type="hidden" id="KitchenTentRatingValue" name="CampManagmentRatingTL[0].KitchenTentRating" value="0" />
+                                        </div>
+
+
+
+
+                                        <div class="d-flex gap-4 align-items-center">
+                                            <label class="form-label d-block">Table Serving Manners</label>
+                                            <div class="star-rating">
+                                                <input type="radio" id="TableServing1" name="CampManagmentRatingTL[0].TableServingRating" value="5" @(rating?.TableServingRating == 5 ? "checked" : "") />
+                                                <label for="TableServing1">&#9733;</label>
+
+                                                <input type="radio" id="TableServing2" name="CampManagmentRatingTL[0].TableServingRating" value="4" @(rating?.TableServingRating == 4 ? "checked" : "") />
+                                                <label for="TableServing2">&#9733;</label>
+
+                                                <input type="radio" id="TableServing3" name="CampManagmentRatingTL[0].TableServingRating" value="3" @(rating?.TableServingRating == 3 ? "checked" : "") />
+                                                <label for="TableServing3">&#9733;</label>
+
+                                                <input type="radio" id="TableServing4" name="CampManagmentRatingTL[0].TableServingRating" value="2" @(rating?.TableServingRating == 2 ? "checked" : "") />
+                                                <label for="TableServing4">&#9733;</label>
+
+                                                <input type="radio" id="TableServing5" name="CampManagmentRatingTL[0].TableServingRating" value="1" @(rating?.TableServingRating == 1 ? "checked" : "") />
+                                                <label for="TableServing5">&#9733;</label>
+                                            </div>
+                                            <input type="hidden" id="TableServingRatingValue" name="CampManagmentRatingTL[0].TableServingRating" value="0" />
+                                        </div>
+
+
+                                        <!-- Hygiene Rating -->
+                                        <div class="d-flex gap-4 align-items-center">
+                                            <label class="form-label d-block">Hygiene</label>
+                                            <div class="star-rating">
+                                                <input type="radio" id="hygiene1" name="CampManagmentRatingTL[0].hygieneRating" value="5" @(rating?.hygieneRating == 5 ? "checked" : "") />
+                                                <label for="hygiene1">&#9733;</label>
+
+                                                <input type="radio" id="hygiene2" name="CampManagmentRatingTL[0].hygieneRating" value="4" @(rating?.hygieneRating == 4 ? "checked" : "") />
+                                                <label for="hygiene2">&#9733;</label>
+
+                                                <input type="radio" id="hygiene3" name="CampManagmentRatingTL[0].hygieneRating" value="3" @(rating?.hygieneRating == 3 ? "checked" : "") />
+                                                <label for="hygiene3">&#9733;</label>
+
+                                                <input type="radio" id="hygiene4" name="CampManagmentRatingTL[0].hygieneRating" value="2" @(rating?.hygieneRating == 2 ? "checked" : "") />
+                                                <label for="hygiene4">&#9733;</label>
+
+                                                <input type="radio" id="hygiene5" name="CampManagmentRatingTL[0].hygieneRating" value="1" @(rating?.hygieneRating == 1 ? "checked" : "") />
+                                                <label for="hygiene5">&#9733;</label>
+                                            </div>
+                                            <input type="hidden" id="hygieneRatingValue" name="CampManagmentRatingTL[0].hygieneRating" value="0" />
+                                        </div>
+
+                                    </div>
+                                </div>
+ 
+
+                                <br />
+                                <div>
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Photos and videos
+                                        </b>
+                                    </label>
+                                    <p class="form-label d-block">2 photos and videos (max 20 sec) of each topic (Portrait and landscape)</p>
+                                    <label class="form-label d-block">
+
+                                        <b>Briefing and Health check-up | Photos and videos | 2 Portrait and 2 Landscape</b>
+
+                                    </label>
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="HealthCheckupVandP" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="HealthCheckupVandP" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Exercise | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="ExercisePandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="ExercisePandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Lecture | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="LecturePandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="LecturePandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            While Trekking | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="WhileTrekkingPandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="WhileTrekkingPandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Scenery | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="SceneryPandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="SceneryPandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Food | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="FoodPandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="FoodPandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Summit | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="SubmitPandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="SubmitPandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Camp site | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="CampSitePandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="CampSitePandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Camp cleaning | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="CampCleaningPandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="CampCleaningPandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Trekkers Playing, Talking, Other activity | Photos and videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="TrekkerActivityPandV" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="TrekkerActivityPandV" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Interview 4 Videos | 2 Portrait and 2 Landscape
+                                        </b>
+                                    </label>
+
+                                    <div class="d-flex gap-3">
+                                        <div class="form-check">
+                                            <input asp-for="InterviewVideo" class="form-check-input" type="radio" id="yes" value="yes">
+                                            <label class="form-check-label" for="yes">Yes</label>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input asp-for="InterviewVideo" class="form-check-input" type="radio" id="yes" value="no">
+                                            <label class="form-check-label" for="no">No</label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Google Review Count</label>
+                                        <div class="d-flex gap-2">
+                                            <input asp-for="GReviewCount" type="number" class="form-control form-control-sm w-25"  placeholder="review" />
+
+
+
+
+                                        </div>
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <label class="form-label d-block">
+                                        <b>
+                                            Anything to Mentionable
+                                        </b>
+                                    </label>
+                                    <div class="col-md-5">
+                                        <label class="form-label"><b>Trekker Status</b></label>
+
+                                        @if (ViewBag.Participants != null)
+                                        {
+                                            <div id="participantContainer">
+                                                @for (var i = 0; i < ViewBag.Participants.Count; i++)
+                                                {
+                                                    var participant = ViewBag.Participants[i];
+                                                    var trekkerStatus = Model?.TrekkersStatus?.FirstOrDefault(a => a.ParticipantId == participant.ParticipantId);
+                                                    string statusName = trekkerStatus?.TrekkerStatus ?? "";
+
+                                                    <div class="d-flex gap-2 mb-2">
+                                                        <input type="hidden" name="TrekkersStatus[@i].ParticipantId" value="@participant.ParticipantId" />
+                                                        <input type="hidden" name="TrekkersStatus[@i].FirstName" value="@participant.FirstName" />
+                                                        <input type="hidden" name="TrekkersStatus[@i].LastName" value="@participant.LastName" />
+
+                                                        <input type="text" class="form-control form-control-sm w-25"
+                                                               value="@(participant.FirstName) @(participant.LastName)" readonly />
+
+                                                        <select class="form-select form-select-sm" name="TrekkersStatus[@i].TrekkerStatus" required>
+                                                            @foreach (var option in new[] {
+                                                    "Summited",
+                                                    "Completed, Not Summited",
+                                                    "Return Halfway",
+                                                    "Return from Base Camp",
+                                                    "Didn't Reach Base Camp" })
+                                                            {
+                                                                <option value"">Choose ---</option>
+                                                                <option value="@option" selected="@(statusName == option ? "selected" : null)">@option</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="alert alert-info">No participants found.</div>
+                                        }
+                                    </div>
+
+                                    <div class="form-group col-md-5">
+
+                                        <label>Enter Details:</label>
+                                        <textarea asp-for="TextArea" class="form-control" rows="5" placeholder="Type here..."></textarea>
+                                    </div>
+
+
+                                </div>
+
+
+
+                                <div class="mt-4 col-md-4">
+                                    <button type="submit" id="submitButton">Approval</button>
+
+                                </div>
+
+
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* <script>
+    document.querySelectorAll('.star-rating input[type="radio"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            let ratingasp-for = this.asp -for;
+                let ratingValue = this.value;
+            document.getElementById(ratingasp -for + 'Value').value = ratingValue;
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const submitButton = document.getElementById("submitButton");
+        const form = document.getElementById("tLForm");
+
+        function updateRatingValue(ratingasp-for, hiddenInputId) {
+            let selectedRating = document.querySelector(input[asp -for= "${ratingasp-for}"]:checked);
+    if (selectedRating) {
+        document.getElementById(hiddenInputId).value = selectedRating.value;
+    }
+            }
+
+    if (submitButton && form) {
+        submitButton.onclick = function (event) {
+            event.preventDefault(); // Prevent default submission for debugging
+            console.log("Form submitting..."); // Check if this appears in the console
+
+            // Update hidden input fields with the selected rating values
+            updateRatingValue("toiletRating", "toiletRatingValue");
+            updateRatingValue("DiningTentRating", "DiningTentRatingValue");
+            updateRatingValue("KitchenTentRating", "KitchenTentRatingValue");
+            updateRatingValue("TableServingRating", "TableServingRatingValue");
+            updateRatingValue("hygieneRating", "hygieneRatingValue");
+
+            console.log("Toilet Rating:", document.getElementById("toiletRatingValue").value);
+            console.log("Dining Tent Rating:", document.getElementById("DiningTentRatingValue").value);
+            console.log("Kitchen Tent Rating:", document.getElementById("KitchenTentRatingValue").value);
+            console.log("Table Serving Rating:", document.getElementById("TableServingRatingValue").value);
+            console.log("Hygiene Rating:", document.getElementById("hygieneRatingValue").value);
+
+            form.submit();
+        };
+    } else {
+        console.error("Form or submit button not found!");
+    }
+        });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".star-rating input").forEach((radio) => {
+            radio.addEventListener("change", function () {
+                let ratingasp-for = this.asp -for;
+                    let selectedValue = this.value;
+                document.getElementById(ratingasp -for + "Value").value = selectedValue;
+            });
+        });
+    });
+
+    document.querySelectorAll('.star-rating input[type="radio"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            let ratingasp-for = this.asp -for;
+                let ratingValue = this.value;
+            // Update the hidden input value
+            let hiddenInput = document.querySelector(input[asp -for= "${ratingasp-for}Value"]);
+        if (hiddenInput) {
+            hiddenInput.value = ratingValue;
+        }
+    });
+        });
+
+</script> *@

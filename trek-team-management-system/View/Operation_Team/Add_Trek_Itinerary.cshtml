@@ -1,0 +1,267 @@
+﻿@model TTH.Areas.Super.Models.Trek.TrekViewModel
+
+<style>
+    .FixedDeparture_Form{
+        display:none;
+    }
+
+    .customizeButton,
+    .fixedDepartureButton {
+        background: white !important;
+        border:1px solid #ee3038 !important;
+        color:#ee3038;
+    }
+    .customizeButton.active, 
+    .fixedDepartureButton.active{
+        background:#ee3038 !important;
+        color:white;
+    }
+</style>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="text-center">Add Trek Itinerary</h5>
+                        </div>
+                        @if (ViewBag.IsSuccess)
+                        {
+                            <div class="alert alert-success">Trek Itinerary added successfully!</div>
+                        }
+                        <div class="card-body">
+                            <div class="d-flex justify-content-center gap-3">
+                                <button type="button" class="btn customizeButton active" onclick="CustomizedView()">Customize</button>
+                                <button type="button" class="btn fixedDepartureButton" onclick="FixedView()">Fixed Departure</button>
+                            </div>
+
+                            <form class="Customize_Form" method="post" id="CustomizedView">
+                                <div class="row">
+                                    <div class="mb-3">
+                                        <h3>Customize Trek</h3>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label for="trekName" class="form-label">Trek Name</label>
+                                                <select class="form-control" id="trekDropdown" name="trekId" required>
+                                                    <option value="" disabled selected>Select Trek</option>
+                                                    @foreach (var trek in Model.Treks)
+                                                    {
+                                                        <option value="@trek.TrekId">@trek.TrekName</option>
+                                                    }
+                                                    <option value="Other">Other</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="TrekShortName" class="form-label">Trek Short Name (Don't use - and blank space)</label>
+                                                <input type="text" class="form-control" name="TrekShortName" required />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="startDate" class="form-label">Start Date</label>
+                                                <input type="date" class="form-control" name="startDate" required />
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="endDate" class="form-label">End Date</label>
+                                                <input type="date" class="form-control" name="endDate" required />
+                                            </div>
+                                        </div>
+                                       
+
+                                        <div class="mb-3 d-none" id="customTrekNameContainer">
+                                            <label for="customTrekName" class="form-label">Enter Custom Trek Name</label>
+                                            <input type="text" class="form-control" id="customTrekName" name="customTrekName" placeholder="Enter Trek Name" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                               
+
+                                <div class="mb-3">
+                                    <label>Add Days</label>
+                                </div>
+
+                                <button type="button" class="btn btn-danger mb-3 removeButton">-</button>
+                                <button type="button" class="btn btn-danger mb-3 addButton">+</button>
+
+                                <div class="inputContainer">
+                                    <div class="mb-3" id="inputGroup-1">
+                                        <label for="day1">Day 1(Don't use - in Day 1)</label>
+                                        <input type="text" class="form-control mb-2" name="day1" placeholder="Enter trek activity" />
+                                    </div>
+                                </div>
+
+                                <label for="ToDate" class="form-label">Trek Leader Needed Days</label>
+                                <div class="mb-3 row">
+                                    <div class="col-md-4 d-flex align-items-center">
+                                        <label for="FromTlDate" class="me-2">From</label>
+                                        <input type="text" class="form-control" id="FromTlDate" name="FromDate" required />
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-center">
+                                        <label for="TOTlDate" class="me-2">To</label>
+                                        <input type="text" class="form-control" id="TOTlDate" name="TODate" required />
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="ItineraryType" value="Customize" />
+                                <button type="submit" class="btn btn-success">Submit</button>
+                            </form>
+
+                            <form class="FixedDeparture_Form" method="post" id="FixedView">
+                                <div class="mb-3">
+                                    <h3>Fixed Departure Trek</h3>
+
+                                    <div class="mb-3">
+                                        <label for="trekName" class="form-label">Trek Name</label>
+                                        <select class="form-control" id="trekDropdownFixed" name="trekId" required>
+                                            <option value="" disabled selected>Select Trek</option>
+                                            @foreach (var trek in Model.FixedTreks)
+                                            {
+                                                <option value="@trek.TrekId">@trek.TrekName</option>
+                                            }
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3 d-none" id="customTrekNameContainerFixed">
+                                        <label for="customTrekName" class="form-label">Enter Custom Trek Name</label>
+                                        <input type="text" class="form-control" id="customTrekNameFixed" name="customTrekName" placeholder="Enter Trek Name" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label for="TrekShortName" class="form-label">Trek Short Name</label>
+                                        <input type="text" class="form-control" name="TrekShortName" required />
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn btn-danger mb-3 removeButton">-</button>
+                                <button type="button" class="btn btn-danger mb-3 addButton">+</button>
+
+                                <div class="inputContainer">
+                                    <div class="mb-3" id="inputGroup-1">
+                                        <label for="day1">Day 1(Don't use - in Day 1)</label>
+                                        <input type="text" class="form-control mb-2" name="day1" placeholder="Enter trek activity" />
+                                    </div>
+                                </div>
+
+                                <label for="ToDate" class="form-label">Trek Leader Needed</label>
+                                <div class="mb-3 row">
+                                    <div class="col-md-4 d-flex align-items-center">
+                                        <label for="FromTlDate" class="me-2">From</label>
+                                        <input type="text" class="form-control" id="FromTlDate" name="FromDate" required />
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-center">
+                                        <label for="TOTlDate" class="me-2">To</label>
+                                        <input type="text" class="form-control" id="TOTlDate" name="TODate" required />
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="ItineraryType" value="Fixed" />
+                                <button type="submit" class="btn btn-danger">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(".customizeButton, .fixedDepartureButton").on("click", function () {
+            $(".customizeButton, .fixedDepartureButton").removeClass("active");
+            $(this).addClass("active");
+        });
+    });
+    function CustomizedView() {
+        document.getElementById("CustomizedView").style.display = "block";
+        document.getElementById("FixedView").style.display = "none";
+    }
+    function FixedView() {
+        document.getElementById("CustomizedView").style.display = "none";
+        document.getElementById("FixedView").style.display = "block";
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+       
+        // const customizeButton = document.querySelector(".customizeButton");
+        // const fixedDepartureButton = document.querySelector(".fixedDepartureButton");
+        // const customizeForm = document.querySelector(".Customize_Form");
+        // const fixedDepartureForm = document.querySelector(".FixedDeparture_Form");
+
+        // customizeForm.classList.remove("d-none");
+        // fixedDepartureForm.classList.add("d-none");
+
+        // customizeButton.addEventListener("click", function () {
+        //     customizeForm.classList.remove("d-none");
+        //     fixedDepartureForm.classList.add("d-none");
+        // });
+
+        // fixedDepartureButton.addEventListener("click", function () {
+        //     fixedDepartureForm.classList.remove("d-none");
+        //     customizeForm.classList.add("d-none");
+        // });
+
+        // Handle trek name input visibility for Customize form
+        document.getElementById("trekDropdown").addEventListener("change", function () {
+            const selectedValue = this.value;
+            const customTrekNameContainer = document.getElementById("customTrekNameContainer");
+
+            if (selectedValue === "Other") {
+                customTrekNameContainer.classList.remove("d-none");
+            } else {
+                customTrekNameContainer.classList.add("d-none");
+                customTrekNameContainer.querySelector("input").value = "";
+            }
+        });
+
+        $(document).ready(function () {
+            $(".customizeButton").click(function () {
+                $(this).removeClass("btn-secondary").addClass("btn-primary");
+                $(".fixedDepartureButton").removeClass("btn-primary").addClass("btn-secondary");
+            });
+
+            $(".fixedDepartureButton").click(function () {
+                $(this).removeClass("btn-secondary").addClass("btn-primary");
+                $(".customizeButton").removeClass("btn-primary").addClass("btn-secondary");
+            });
+        });
+        // Handle trek name input visibility for Fixed Departure form
+        document.getElementById("trekDropdownFixed").addEventListener("change", function () {
+            const selectedValue = this.value;
+            const customTrekNameContainerFixed = document.getElementById("customTrekNameContainerFixed");
+
+            if (selectedValue === "Other") {
+                customTrekNameContainerFixed.classList.remove("d-none");
+            } else {
+                customTrekNameContainerFixed.classList.add("d-none");
+                customTrekNameContainerFixed.querySelector("input").value = "";
+            }
+        });
+
+        // Handle dynamic addition/removal of activity days
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("addButton")) {
+                const form = e.target.closest("form");
+                const inputContainer = form.querySelector(".inputContainer");
+                const dayCount = inputContainer.children.length + 1;
+
+                const newInputGroup = document.createElement("div");
+                newInputGroup.classList.add("mb-3");
+                newInputGroup.id = `inputGroup-${dayCount}`;
+
+                newInputGroup.innerHTML = `
+                        <label for="day${dayCount}">Day ${dayCount}</label>
+                        <input type="text" class="form-control mb-2" name="day${dayCount}" placeholder="Enter trek activity" />
+                    `;
+
+                inputContainer.appendChild(newInputGroup);
+            } else if (e.target.classList.contains("removeButton")) {
+                const form = e.target.closest("form");
+                const inputContainer = form.querySelector(".inputContainer");
+
+                if (inputContainer.children.length > 1) {
+                    inputContainer.removeChild(inputContainer.lastChild);
+                }
+            }
+        });
+    });
+</script>

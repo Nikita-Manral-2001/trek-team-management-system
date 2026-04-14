@@ -1,0 +1,351 @@
+﻿@using TTH.Areas.Super.Models
+@model TeamFeedbackApprovalViewModel
+
+
+@{
+    var groupedTreks = Model.PendingApprovals.ToList();
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="content">
+                <div id="dynamicContent">
+                    <div class="card shadow-lg border-0 rounded">
+                        <div class="card-header bg-danger text-white text-center">
+                            <h3 class="mb-0">Feedback Form</h3>
+                        </div>
+
+                        <!-- Pending Approvals -->
+                        <div class="p-2 d-flex justify-content-between align-items-center bg-light border-bottom" id="pendingApprovalHeader" style="cursor: pointer;">
+                            <h5 class="mb-0 font-weight-bold">Pending Approvals (@ViewBag.PendingTrekCount)</h5>
+                            <span id="togglePendingIcon" class="fs-5">&#9660;</span>
+                        </div>
+                        <div id="pendingApprovalTable" style="display: none;" class="p-2">
+                            <table class="table table-sm table-bordered table-hover text-center">
+                                <thead class="bg-success text-white">
+                                    <tr>
+                                        <th>Trek</th>
+                                        <th>Start</th>
+                                        <th>ToDate</th>
+                                        <th>Role</th>
+                                        <th>Name</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (var trek in Model.PendingApprovals)
+                                    {
+                                        var tl = Model.PendingApprovals.FirstOrDefault(t => t.Designation == "TL" && t.TrekId == trek.TrekId && t.DepartureId == trek.DepartureId);
+                                        var chef = Model.PendingApprovals.FirstOrDefault(t => t.Designation == "Chef" && t.TrekId == trek.TrekId && t.DepartureId == trek.DepartureId);
+
+                                        <tr>
+                                            <td>@trek.TrekName</td>
+                                            <td>@trek.StartDate.ToString("dd-MM-yyyy")</td>
+                                            <td>@trek.ToDate.ToString("dd-MM-yyyy")</td>
+                                            <td>@trek.Designation</td>
+                                            <td>
+                                                @if (trek.Designation == "TL" && chef != null)
+                                                {
+                                                    @chef.TeamMemberName
+                                                }
+                                                else
+                                                {
+                                                    @trek.TeamMemberName
+                                                }
+                                            </td>
+                                            <td>  <button type="button" class="btn btn-danger btn-sm delete-btn fas fa-trash-alt " data-id="@trek.Id"></button></td>
+                                        </tr>
+                                    }
+
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Submitted Approvals -->
+                        <div class="p-2 d-flex justify-content-between align-items-center bg-light border-bottom" id="submittedApprovalHeader" style="cursor: pointer;">
+                            <h5 class="mb-0 font-weight-bold">Submitted Approvals (@ViewBag.submittedTrekDetails)</h5>
+                            <span id="toggleSubmittedIcon" class="fs-5">&#9660;</span>
+                        </div>
+                        <div id="submittedApprovalTable" style="display: none;" class="p-2">
+                            <table class="table table-sm table-bordered table-hover text-center">
+                                <thead class="bg-success text-white">
+                                    <tr>
+                                        <th>Trek</th>
+                                        <th>Start</th>
+                                        <th>SubmissionDate</th>
+
+                                        <th>Name</th>
+                                        <th>View</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @foreach (var trek in Model.SubmittedApprovals)
+                                    {
+                                        var startDate = trek.StartDate.ToString("yyyy-MM-dd");
+                                        var toDate = trek.ToDate.ToString("yyyy-MM-dd");
+                                        var Batch = trek.Batch;
+
+                                        <tr>
+                                            <td>@trek.TrekName</td>
+                                            <td>@trek.StartDate.ToString("dd-MM-yyyy")</td>
+                                            <td>@trek.FormSubmissionDate.ToString("dd-MM-yyyy")</td>
+                                            <td>@trek.TeamMemberName</td>
+                                            <td>
+                                                @if (trek.Designation == "BCM")
+                                                {
+                                                    <a asp-controller="ViewOperationTeamDetails"
+                                                       asp-action="EditBCMForm"
+                                                       asp-route-departureId="@trek.DepartureId"
+                                                       asp-route-trekId="@trek.TrekId"
+                                                       asp-route-trekName="@trek.TrekName"
+                                                       asp-route-startDate="@startDate"
+                                                       asp-route-toDate="@toDate"
+                                                       asp-route-teamMemberName="@trek.TeamMemberName"
+                                                       asp-route-id="@trek.Id"
+                                                       asp-route-designation="@trek.Designation"
+                                                       class="btn btn-primary btn-sm feed_button">
+                                                        BCM Approval
+                                                    </a>
+                                                }
+                                                @if (trek.Designation == "TL")
+                                                {
+                                                    bool isButtonRendered = false;
+
+                                                    @foreach (var chef in Model.ChefTrekDetails)
+                                                    {
+                                                        var chefStartDate = chef.StartDate.ToString("yyyy-MM-dd");
+                                                        var chefToDate = chef.ToDate.ToString("yyyy-MM-dd");
+                                                        var chefBatch = chef.Batch;
+
+                                                        if (chef.TrekName == trek.TrekName &&
+                                                        chefStartDate == startDate &&
+                                                        chefToDate == toDate && chefBatch==Batch && chef.Approval == "Submitted")
+                                                        {
+                                                            isButtonRendered = true;
+                                                            <a asp-controller="ViewOperationTeamDetails"
+                                                               asp-action="EditChefForm"
+                                                               asp-route-departureId="@chef.DepartureId"
+                                                               asp-route-trekId="@chef.TrekId"
+                                                               asp-route-trekName="@chef.TrekName"
+                                                               asp-route-startDate="@chefStartDate"
+                                                               asp-route-toDate="@chefToDate"
+                                                               asp-route-teamMemberName="@chef.TeamMemberName"
+                                                               asp-route-id="@chef.Id"
+                                                               asp-route-designation="@chef.Designation"
+                                                               class="btn btn-success btn-sm mt-1">
+                                                                Chef Approval
+                                                            </a>
+                                                            <a asp-controller="ViewOperationTeamDetails"
+                                                               asp-action="EditTLForm"
+                                                               asp-route-departureId="@trek.DepartureId"
+                                                               asp-route-trekId="@trek.TrekId"
+                                                               asp-route-trekName="@trek.TrekName"
+                                                               asp-route-startDate="@startDate"
+                                                               asp-route-toDate="@toDate"
+                                                               asp-route-teamMemberName="@trek.TeamMemberName"
+                                                               asp-route-id="@trek.Id"
+                                                               asp-route-designation="@trek.Designation"
+                                                               class="btn btn-primary btn-sm mt-1 feed_button">
+                                                                TL Approval
+                                                            </a>
+                                                        }
+                                                        else if (chef.TrekName == trek.TrekName &&
+                                                        chefStartDate == startDate &&
+                                                        chefToDate == toDate && chefBatch == Batch && chef.Approval == "Pending")
+                                                        {
+                                                            isButtonRendered = true;
+                                                            <a asp-controller="ViewOperationTeamDetails"
+                                                               asp-action="EditChefForm"
+                                                               asp-route-departureId="@chef.DepartureId"
+                                                               asp-route-trekId="@chef.TrekId"
+                                                               asp-route-trekName="@chef.TrekName"
+                                                               asp-route-startDate="@chefStartDate"
+                                                               asp-route-toDate="@chefToDate"
+                                                               asp-route-teamMemberName="@chef.TeamMemberName"
+                                                               asp-route-id="@chef.Id"
+                                                               asp-route-designation="@chef.Designation"
+                                                               class="btn btn-success btn-sm mt-1">
+                                                                Chef Approval
+                                                            </a>
+                                                            <a asp-controller="ViewOperationTeamDetails"
+                                                               asp-action="EditTLForm"
+                                                               asp-route-departureId="@trek.DepartureId"
+                                                               asp-route-trekId="@trek.TrekId"
+                                                               asp-route-trekName="@trek.TrekName"
+                                                               asp-route-startDate="@startDate"
+                                                               asp-route-toDate="@toDate"
+                                                               asp-route-teamMemberName="@trek.TeamMemberName"
+                                                               asp-route-id="@trek.Id"
+                                                               asp-route-designation="@trek.Designation"
+                                                               class="btn btn-primary btn-sm mt-1 feed_button disabled">
+                                                                TL Approval
+                                                            </a>
+                                                        }
+                                                    }
+
+                                                    @if (!isButtonRendered)
+                                                    {
+                                                        <a asp-controller="ViewOperationTeamDetails"
+                                                           asp-action="EditTLForm"
+                                                           asp-route-departureId="@trek.DepartureId"
+                                                           asp-route-trekId="@trek.TrekId"
+                                                           asp-route-trekName="@trek.TrekName"
+                                                           asp-route-startDate="@startDate"
+                                                           asp-route-toDate="@toDate"
+                                                           asp-route-teamMemberName="@trek.TeamMemberName"
+                                                           asp-route-id="@trek.Id"
+                                                           asp-route-designation="@trek.Designation"
+                                                           class="btn btn-primary btn-sm mt-1 feed_button">
+                                                            TL Approval
+                                                        </a>
+                                                    }
+                                                }
+
+
+
+
+
+
+
+
+
+
+                                            </td>
+                                        </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    }
+
+
+
+
+
+
+
+                                    <!-- Loop through ChefTrekDetails where no match is found -->
+                                    @foreach (var chef in Model.ChefTrekDetails)
+                                    {
+                                        var chefStartDate = chef.StartDate.ToString("yyyy-MM-dd");
+                                        var chefToDate = chef.ToDate.ToString("yyyy-MM-dd");
+
+                                        // Check if the chef record is missing in SubmittedApprovals
+                                        if (!Model.SubmittedApprovals.Any(trek =>
+                                        trek.TrekName == chef.TrekName &&
+                                        trek.StartDate.ToString("yyyy-MM-dd") == chefStartDate &&
+                                        trek.ToDate.ToString("yyyy-MM-dd") == chefToDate &&
+                                        trek.Designation == "TL"))
+                                        {
+                                            <tr>
+                                                <td>@chef.TrekName</td>
+                                                <td>@chef.StartDate.ToString("dd-MM-yyyy")</td>
+                                                <td>@chef.FormSubmissionDate.ToString("dd-MM-yyyy")</td>
+                                                <td>@chef.TeamMemberName</td>
+                                                <td>
+                                                    <a asp-controller="ViewOperationTeamDetails"
+                                                       asp-action="EditChefForm"
+                                                       asp-route-departureId="@chef.DepartureId"
+                                                       asp-route-trekId="@chef.TrekId"
+                                                       asp-route-trekName="@chef.TrekName"
+                                                       asp-route-startDate="@chefStartDate"
+                                                       asp-route-toDate="@chefToDate"
+                                                       asp-route-teamMemberName="@chef.TeamMemberName"
+                                                       asp-route-id="@chef.Id"
+                                                       asp-route-designation="@chef.Designation"
+                                                       class="btn btn-success btn-sm mt-1">
+                                                        Chef Approval
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+
+
+
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div> <!-- End of card shadow -->
+                </div> <!-- End of dynamicContent -->
+            </div> <!-- End of content -->
+        </div> <!-- End of col-md-8 -->
+    </div> <!-- End of row -->
+</div> <!-- End of container -->
+
+<script>
+    function toggleTable(headerId, tableId, iconId) {
+        document.getElementById(headerId).addEventListener("click", function () {
+            var table = document.getElementById(tableId);
+            var icon = document.getElementById(iconId);
+            if (table.style.display === "none") {
+                table.style.display = "block";
+                icon.innerHTML = "&#9650;"; // Up Arrow
+            } else {
+                table.style.display = "none";
+                icon.innerHTML = "&#9660;"; // Down Arrow
+            }
+        });
+    }
+
+    toggleTable("pendingApprovalHeader", "pendingApprovalTable", "togglePendingIcon");
+    toggleTable("submittedApprovalHeader", "submittedApprovalTable", "toggleSubmittedIcon");
+</script>
+<script>
+    document.addEventListener("click", function (e) {
+        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+        const token = tokenInput ? tokenInput.value : "";
+        const btn = e.target.closest("button");
+        if (!btn) return;
+
+        // --- DELETE ---
+        if (btn.classList.contains("delete-btn")) {
+            const id = btn.dataset.id; // <-- This will come now
+
+            if (confirm("Are you sure you want to delete this leave?")) {
+
+                fetch(`/super/ViewOperationTeamDetails/DeleteEmployeeLeave/${id}`, {  // <-- Use backticks
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "RequestVerificationToken": token
+                    }
+                })
+                .then(r => {
+                    if (r.ok) {
+                        location.reload();
+                    } else {
+                        alert("Failed to delete the leave.");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error:", err);
+                });
+            }
+        }
+    });
+</script>
+
+

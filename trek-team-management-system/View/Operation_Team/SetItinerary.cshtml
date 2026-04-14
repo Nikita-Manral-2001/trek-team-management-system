@@ -1,0 +1,63 @@
+﻿@using TTH.Areas.Super.Data.Operation_Team
+@model List<TrekItinerary>
+
+<section class="DetailsSection">
+<div class="">
+        <h3 class="text-center text-success">
+            Trek Itineraries
+        </h3>
+    </div>
+    <table id="myTable">
+        <thead >
+            <tr>
+                <th>Series</th>
+                <th>Trek Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Tl Needed From Date</th>
+                <th>Tl Needed To Date</th>
+                <th>Itinerary Type</th>
+                
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var trek in Model)
+                {
+                    <tr>
+                        <td>@trek.Id</td>
+                        <td>@trek.TrekName</td>
+                        <td>@trek.StartDate?.ToString("yyyy-MM-dd")</td>
+                        <td>@trek.EndDate?.ToString("yyyy-MM-dd")</td>
+                        <td>@trek.FromDate</td>
+                        <td>@trek.ToDate</td>
+                        <td>@trek.ItineraryType</td>
+                     
+                        <td>
+                            <a href="@Url.Action("Edit_Itinerary", new { id = trek.Id })" class="btn btn-success btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form asp-action="Delete_Itinerary" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@trek.Id" />
+                                <input type="hidden" name="trekId" value="@trek.TrekId"/>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this itinerary?');">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="8" class="text-center">No itineraries available.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</section>
